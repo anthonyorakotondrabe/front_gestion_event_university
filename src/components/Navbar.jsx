@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../features/auth/hooks/useAuth';
 import { useSearch } from '../context/SearchContext';
@@ -5,9 +6,39 @@ import { useSearch } from '../context/SearchContext';
 const Navbar = ({ onMenuClick }) => {
   const { data: user } = useUser();
   const { searchQuery, setSearchQuery } = useSearch();
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   return (
     <nav className="h-16 bg-[#0a0a1a] border-b border-[#1e1e3a] flex items-center justify-between px-7 sticky top-0 z-50 transition-all duration-300">
+      {/* Mobile Search Overlay */}
+      {isMobileSearchOpen && (
+        <div className="absolute inset-0 bg-[#0a0a1a] z-[60] flex items-center px-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              autoFocus
+              placeholder="Rechercher..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#161630] border border-[#1e1e3a] rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-[#64748b] focus:outline-none focus:ring-1 focus:ring-[#4f46e5] transition-all"
+            />
+          </div>
+          <button
+            onClick={() => setIsMobileSearchOpen(false)}
+            className="ml-3 p-2 text-[#94a3b8] hover:text-white"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center gap-4 flex-1">
         {/* Hamburger button for mobile */}
         {user && (
@@ -21,7 +52,7 @@ const Navbar = ({ onMenuClick }) => {
           </button>
         )}
 
-        {/* Global Search Input */}
+        {/* Global Search Input (Desktop) */}
         {user && (
           <div className="relative max-w-md w-full hidden sm:block">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b]">
@@ -56,14 +87,17 @@ const Navbar = ({ onMenuClick }) => {
       <div className="flex items-center gap-4">
         {user ? (
           <div className="flex items-center gap-4">
-            {/* Mobile Search Icon - Could be improved with a toggleable overlay later */}
-            <button className="p-2 text-[#94a3b8] sm:hidden">
+            {/* Mobile Search Toggle Icon */}
+            <button
+              onClick={() => setIsMobileSearchOpen(true)}
+              className="p-2 text-[#94a3b8] sm:hidden hover:bg-[#161630] rounded-lg transition-colors"
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
 
-            <div className="text-right">
+            <div className="text-right hidden xs:block">
               <p className="text-sm font-semibold text-[#e2e8f0] leading-tight">{user.nom}</p>
               <p className="text-[11px] font-medium text-[#64748b] uppercase tracking-wider">{user.role}</p>
             </div>

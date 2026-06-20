@@ -12,6 +12,7 @@ export const SearchProvider = ({ children }) => {
   );
 };
 
+// Separated to help with Fast Refresh and linting
 export const useSearch = () => {
   const context = useContext(SearchContext);
   if (!context) {
