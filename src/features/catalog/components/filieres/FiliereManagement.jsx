@@ -2,18 +2,19 @@ import { useState } from 'react';
 import { useFilieres } from '../../hooks/useCatalog';
 import FiliereList from './FiliereList';
 import FiliereForm from './FiliereForm';
+import { useSearch } from '../../../../context/SearchContext';
 
 /**
  * Page de gestion des filières pour l'administration.
  */
 const FiliereManagement = () => {
   const { data: filieres, isLoading, error } = useFilieres();
-  const [searchTerm, setSearchTerm] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingFiliere, setEditingFiliere] = useState(null);
+  const { searchQuery } = useSearch();
 
   const filteredFilieres = filieres?.filter(f =>
-    f.nom_filiere.toLowerCase().includes(searchTerm.toLowerCase())
+    f.nom_filiere.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleEdit = (filiere) => {
@@ -56,23 +57,11 @@ const FiliereManagement = () => {
         </button>
       </div>
 
-      {/* Search & Stats Bar */}
-      <div className="flex flex-col md:flex-row gap-4 items-center bg-white dark:bg-[#1f2028] p-4 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
-        <div className="relative flex-1 w-full">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Rechercher une filière..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-6 py-3.5 bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold text-gray-900 dark:text-white"
-          />
-        </div>
+      {/* Stats Bar */}
+      <div className="flex justify-end bg-white dark:bg-[#1f2028] p-4 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
         <div className="px-6 py-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl border border-indigo-100 dark:border-indigo-500/20">
           <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">
-            {filteredFilieres?.length || 0} FILIÈRES
+            {filteredFilieres?.length || 0} FILIÈRES TROUVÉES
           </span>
         </div>
       </div>

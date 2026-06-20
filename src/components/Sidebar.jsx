@@ -1,6 +1,5 @@
-import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import { useUser } from '../features/auth/hooks/useAuth';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { useUser, useLogout } from '../features/auth/hooks/useAuth';
 
 const SidebarItem = ({ to, label, onClick, icon }) => (
   <NavLink
@@ -27,7 +26,15 @@ const NavSectionTitle = ({ children }) => (
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { data: user } = useUser();
+  const logout = useLogout();
+  const navigate = useNavigate();
   const role = user?.role?.toLowerCase().trim() || '';
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    onClose();
+  };
 
   const renderAdminMenu = () => (
     <div className="mb-2">
@@ -78,7 +85,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       `}>
         {/* Brand Logo Section */}
         <div className="flex items-center gap-3 px-3 mb-8">
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-3 group" onClick={onClose}>
             <div className="w-9 h-9 bg-gradient-to-br from-[#4f46e5] to-[#22d3ee] rounded-[10px] flex items-center justify-center shadow-[0_4px_16px_rgba(79,70,229,0.3)] transition-transform group-hover:scale-105">
               <svg className="w-[18px] h-[18px] fill-white" viewBox="0 0 24 24">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
@@ -110,17 +117,29 @@ const Sidebar = ({ isOpen, onClose }) => {
           {(role === 'etudiant' || role === 'étudiant') && renderEtudiantMenu()}
         </nav>
 
-        {/* User Card Footer */}
+        {/* User Card Footer with Logout Icon */}
         <div className="border-t border-[#1e1e3a] pt-4 mt-auto">
-          <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#161630] transition-all cursor-pointer group">
-            <div className="w-[34px] h-[34px] rounded-full bg-gradient-to-br from-[#4f46e5] to-[#22d3ee] flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">
-              {user.nom?.charAt(0).toUpperCase()}
+          <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-2xl bg-[#111128] border border-[#1e1e3a]">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-[34px] h-[34px] rounded-full bg-gradient-to-br from-[#4f46e5] to-[#22d3ee] flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
+                {user.nom?.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <div className="text-[13px] font-semibold text-[#e2e8f0] truncate">{user.nom}</div>
+                <div className="text-[10px] text-[#64748b] truncate capitalize font-medium">{user.role}</div>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-semibold text-[#e2e8f0] truncate">{user.nom}</div>
-              <div className="text-[11px] text-[#64748b] truncate capitalize">{user.role}</div>
-            </div>
-            <span className="text-[#64748b] text-[12px] group-hover:translate-x-1 transition-transform">→</span>
+
+            {/* Logout Button (Logo Only) */}
+            <button
+              onClick={handleLogout}
+              className="p-2 text-[#94a3b8] hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all group"
+              title="Déconnexion"
+            >
+              <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
           </div>
         </div>
       </aside>

@@ -9,6 +9,7 @@ import RegisterForm from './features/auth/components/RegisterForm';
 import Dashboard from './features/dashboard/components/Dashboard';
 import UserManagement from './features/users/components/UserManagement';
 import FiliereManagement from './features/catalog/components/filieres/FiliereManagement';
+import { SearchProvider } from './context/SearchContext';
 import './App.css';
 
 // Placeholder components for empty menus
@@ -22,36 +23,38 @@ const PlaceholderPage = ({ title }) => (
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          {/* Main App Routes with Layout & Sidebar (conditional) */}
-          <Route path="/" element={<Layout><Dashboard /></Layout>} />
+      <SearchProvider>
+        <Router>
+          <Routes>
+            {/* Main App Routes with Layout & Sidebar (conditional) */}
+            <Route path="/" element={<Layout><Dashboard /></Layout>} />
 
-          {/* Admin Routes */}
-          <Route path="/admin/users" element={<Layout><UserManagement /></Layout>} />
-          <Route path="/admin/filieres" element={<Layout><FiliereManagement /></Layout>} />
-          <Route path="/admin/categories" element={<Layout><PlaceholderPage title="Gestion des Catégories" /></Layout>} />
-          <Route path="/admin/lieux" element={<Layout><PlaceholderPage title="Gestion des Lieux" /></Layout>} />
-          <Route path="/admin/moderation" element={<Layout><PlaceholderPage title="Modération globale" /></Layout>} />
+            {/* Admin Routes */}
+            <Route path="/admin/users" element={<Layout><UserManagement /></Layout>} />
+            <Route path="/admin/filieres" element={<Layout><FiliereManagement /></Layout>} />
+            <Route path="/admin/categories" element={<Layout><PlaceholderPage title="Gestion des Catégories" /></Layout>} />
+            <Route path="/admin/lieux" element={<Layout><PlaceholderPage title="Gestion des Lieux" /></Layout>} />
+            <Route path="/admin/moderation" element={<Layout><PlaceholderPage title="Modération globale" /></Layout>} />
 
-          {/* Organisateur Routes */}
-          <Route path="/events/manage" element={<Layout><PlaceholderPage title="Gestion de mes Événements" /></Layout>} />
-          <Route path="/events/registrations" element={<Layout><PlaceholderPage title="Gestion des Inscriptions" /></Layout>} />
+            {/* Organisateur Routes */}
+            <Route path="/events/manage" element={<Layout><PlaceholderPage title="Gestion de mes Événements" /></Layout>} />
+            <Route path="/events/registrations" element={<Layout><PlaceholderPage title="Gestion des Inscriptions" /></Layout>} />
 
-          {/* Etudiant Routes */}
-          <Route path="/my-inscriptions" element={<Layout><PlaceholderPage title="Mes Inscriptions" /></Layout>} />
+            {/* Etudiant Routes */}
+            <Route path="/my-inscriptions" element={<Layout><PlaceholderPage title="Mes Inscriptions" /></Layout>} />
 
-          {/* Common Private Routes */}
-          <Route path="/profile" element={<Layout><PlaceholderPage title="Mon Profil Utilisateur" /></Layout>} />
+            {/* Common Private Routes */}
+            <Route path="/profile" element={<Layout><PlaceholderPage title="Mon Profil Utilisateur" /></Layout>} />
 
-          {/* Public Routes */}
-          <Route path="/events" element={<Layout><PlaceholderPage title="Explorer les Événements" /></Layout>} />
+            {/* Public Routes */}
+            <Route path="/events" element={<Layout><PlaceholderPage title="Explorer les Événements" /></Layout>} />
 
-          {/* Auth Routes with Tech/Innovation Layout */}
-          <Route path="/login" element={<AuthLayout><LoginForm /></AuthLayout>} />
-          <Route path="/register" element={<AuthLayout><RegisterForm /></AuthLayout>} />
-        </Routes>
-      </Router>
+            {/* Auth Routes with Tech/Innovation Layout */}
+            <Route path="/login" element={<AuthLayout><LoginForm /></AuthLayout>} />
+            <Route path="/register" element={<AuthLayout><RegisterForm /></AuthLayout>} />
+          </Routes>
+        </Router>
+      </SearchProvider>
       <Toaster position="top-right" />
     </QueryClientProvider>
   );

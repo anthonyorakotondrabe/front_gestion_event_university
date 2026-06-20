@@ -1,4 +1,3 @@
-import React from 'react';
 import { useUsersList, useDeleteUser } from '../hooks/useUsers';
 import { useFilieres } from '../../catalog/hooks/useCatalog';
 
