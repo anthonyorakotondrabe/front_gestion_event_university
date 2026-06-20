@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import LoginForm from './features/auth/components/LoginForm';
 import RegisterForm from './features/auth/components/RegisterForm';
 import Dashboard from './features/dashboard/components/Dashboard';
+import UserManagement from './features/users/components/UserManagement';
 import './App.css';
 
 // Feature components (Placeholders for now)
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           {/* Main App Routes with Navbar/Layout */}
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
+          <Route path="/admin/users" element={<Layout><UserManagement /></Layout>} />
           <Route path="/events" element={<Layout><EventList /></Layout>} />
           <Route path="/profile" element={<Layout><Profile /></Layout>} />
 
