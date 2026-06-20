@@ -6,10 +6,10 @@ import AuthLayout from './features/auth/components/AuthLayout';
 import { Toaster } from 'react-hot-toast';
 import LoginForm from './features/auth/components/LoginForm';
 import RegisterForm from './features/auth/components/RegisterForm';
+import Dashboard from './features/dashboard/components/Dashboard';
 import './App.css';
 
 // Feature components (Placeholders for now)
-const Home = () => <div>Bienvenue sur l'application de gestion d'événements.</div>;
 const EventList = () => <div>Liste des événements (Feature Events)</div>;
 const Profile = () => <div>Profil utilisateur (Feature Auth)</div>;
 
@@ -19,7 +19,7 @@ function App() {
       <Router>
         <Routes>
           {/* Main App Routes with Navbar/Layout */}
-          <Route path="/" element={<Layout><Home /></Layout>} />
+          <Route path="/" element={<Layout><Dashboard /></Layout>} />
           <Route path="/events" element={<Layout><EventList /></Layout>} />
           <Route path="/profile" element={<Layout><Profile /></Layout>} />
 

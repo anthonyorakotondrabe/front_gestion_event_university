@@ -6,7 +6,7 @@ export const useUser = () => {
     queryKey: ['user'],
     queryFn: authService.getMe,
     retry: false,
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 5, // 5 minutes instead of Infinity
   });
 };
 
@@ -16,7 +16,7 @@ export const useLogin = () => {
     mutationFn: ({ email, password }) => authService.login(email, password),
     onSuccess: (data) => {
       localStorage.setItem('token', data.access_token);
-      queryClient.setQueryData(['user'], data.user);
+      queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
 };

@@ -20,7 +20,7 @@ export const authService = {
     return response.data;
   },
   getMe: async () => {
-    const response = await axiosInstance.get('/auth/me');
+    const response = await axiosInstance.get('/utilisateurs/me');
     return response.data;
   },
   updateProfile: async (id, data) => {
