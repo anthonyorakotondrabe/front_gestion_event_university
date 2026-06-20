@@ -9,6 +9,7 @@ import RegisterForm from './features/auth/components/RegisterForm';
 import Dashboard from './features/dashboard/components/Dashboard';
 import UserManagement from './features/users/components/UserManagement';
 import FiliereManagement from './features/catalog/components/filieres/FiliereManagement';
+import CategoryManagement from './features/catalog/components/categories/CategoryManagement';
 import { SearchProvider } from './context/SearchContext';
 import './App.css';
 
@@ -32,7 +33,7 @@ function App() {
             {/* Admin Routes */}
             <Route path="/admin/users" element={<Layout><UserManagement /></Layout>} />
             <Route path="/admin/filieres" element={<Layout><FiliereManagement /></Layout>} />
-            <Route path="/admin/categories" element={<Layout><PlaceholderPage title="Gestion des Catégories" /></Layout>} />
+            <Route path="/admin/categories" element={<Layout><CategoryManagement /></Layout>} />
             <Route path="/admin/lieux" element={<Layout><PlaceholderPage title="Gestion des Lieux" /></Layout>} />
             <Route path="/admin/moderation" element={<Layout><PlaceholderPage title="Modération globale" /></Layout>} />
 

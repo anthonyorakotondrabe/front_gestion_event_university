@@ -58,7 +58,51 @@ export const useCategories = () => {
   return useQuery({
     queryKey: ['categories'],
     queryFn: catalogService.getCategories,
-    staleTime: Infinity,
+  });
+};
+
+export const useCreateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: catalogService.createCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success('Catégorie créée avec succès');
+    },
+    onError: (error) => {
+      const message = error.response?.data?.detail || "Erreur lors de la création";
+      toast.error(message);
+    }
+  });
+};
+
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => catalogService.updateCategory(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success('Catégorie mise à jour avec succès');
+    },
+    onError: (error) => {
+      const message = error.response?.data?.detail || "Erreur lors de la mise à jour";
+      toast.error(message);
+    }
+  });
+};
+
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: catalogService.deleteCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success('Catégorie supprimée avec succès');
+    },
+    onError: (error) => {
+      const message = error.response?.data?.detail || "Erreur lors de la suppression";
+      toast.error(message);
+    }
   });
 };
 
