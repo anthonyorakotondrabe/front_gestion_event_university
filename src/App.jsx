@@ -10,20 +10,41 @@ import Dashboard from './features/dashboard/components/Dashboard';
 import UserManagement from './features/users/components/UserManagement';
 import './App.css';
 
-// Feature components (Placeholders for now)
-const EventList = () => <div>Liste des événements (Feature Events)</div>;
-const Profile = () => <div>Profil utilisateur (Feature Auth)</div>;
+// Placeholder components for empty menus
+const PlaceholderPage = ({ title }) => (
+  <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+    <h1 className="text-2xl font-bold text-gray-800 mb-4">{title}</h1>
+    <p className="text-gray-600 italic">Cette fonctionnalité est en cours de développement...</p>
+  </div>
+);
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          {/* Main App Routes with Navbar/Layout */}
+          {/* Main App Routes with Layout & Sidebar (conditional) */}
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
+
+          {/* Admin Routes */}
           <Route path="/admin/users" element={<Layout><UserManagement /></Layout>} />
-          <Route path="/events" element={<Layout><EventList /></Layout>} />
-          <Route path="/profile" element={<Layout><Profile /></Layout>} />
+          <Route path="/admin/filieres" element={<Layout><PlaceholderPage title="Gestion des Filières" /></Layout>} />
+          <Route path="/admin/categories" element={<Layout><PlaceholderPage title="Gestion des Catégories" /></Layout>} />
+          <Route path="/admin/lieux" element={<Layout><PlaceholderPage title="Gestion des Lieux" /></Layout>} />
+          <Route path="/admin/moderation" element={<Layout><PlaceholderPage title="Modération globale" /></Layout>} />
+
+          {/* Organisateur Routes */}
+          <Route path="/events/manage" element={<Layout><PlaceholderPage title="Gestion de mes Événements" /></Layout>} />
+          <Route path="/events/registrations" element={<Layout><PlaceholderPage title="Gestion des Inscriptions" /></Layout>} />
+
+          {/* Etudiant Routes */}
+          <Route path="/my-inscriptions" element={<Layout><PlaceholderPage title="Mes Inscriptions" /></Layout>} />
+
+          {/* Common Private Routes */}
+          <Route path="/profile" element={<Layout><PlaceholderPage title="Mon Profil Utilisateur" /></Layout>} />
+
+          {/* Public Routes */}
+          <Route path="/events" element={<Layout><PlaceholderPage title="Explorer les Événements" /></Layout>} />
 
           {/* Auth Routes with Tech/Innovation Layout */}
           <Route path="/login" element={<AuthLayout><LoginForm /></AuthLayout>} />
