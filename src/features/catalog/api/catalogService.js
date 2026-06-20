@@ -36,5 +36,17 @@ export const catalogService = {
   getLieux: async () => {
     const response = await axiosInstance.get('/lieux');
     return response.data;
+  },
+  createLieu: async (data) => {
+    const response = await axiosInstance.post('/lieux', data);
+    return response.data;
+  },
+  updateLieu: async (id, data) => {
+    const response = await axiosInstance.put(`/lieux/${id}`, data);
+    return response.data;
+  },
+  deleteLieu: async (id) => {
+    const response = await axiosInstance.delete(`/lieux/${id}`);
+    return response.data;
   }
 };
