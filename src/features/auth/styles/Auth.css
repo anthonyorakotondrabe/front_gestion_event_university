@@ -1,0 +1,507 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+.auth-page {
+    --bg: #050510;
+    --surface: #0a0a1a;
+    --surface-light: #111128;
+    --primary: #4f46e5;
+    --primary-glow: #818cf8;
+    --accent: #22d3ee;
+    --accent-glow: #67e8f9;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border: #1e1e3a;
+    --border-active: #4f46e5;
+    --error: #f87171;
+    --success: #4ade80;
+    --white: #ffffff;
+
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    color: var(--text);
+}
+
+/* Grille technologique */
+.tech-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        linear-gradient(rgba(79, 70, 229, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79, 70, 229, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 70%);
+}
+
+/* Points lumineux */
+.dots-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.dot {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: dotPulse 3s infinite;
+    box-shadow: 0 0 6px var(--accent-glow);
+}
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(2.5); }
+}
+
+/* Container principal */
+.auth-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: 430px;
+    padding: 40px 32px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 60px rgba(79, 70, 229, 0.05);
+    backdrop-filter: blur(20px);
+    animation: containerIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes containerIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ligne supérieure */
+.top-accent {
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--border-active),
+        var(--accent),
+        var(--border-active),
+        transparent
+    );
+    animation: accentFlow 4s infinite;
+}
+
+@keyframes accentFlow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+/* Logo */
+.auth-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo-mark {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: logoFloat 5s ease-in-out infinite;
+    box-shadow: 0 8px 32px rgba(79, 70, 229, 0.3);
+    position: relative;
+}
+
+.logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    z-index: -1;
+    opacity: 0.4;
+    filter: blur(8px);
+    animation: logoGlow 3s infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes logoGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+.logo-mark svg {
+    width: 22px;
+    height: 22px;
+    fill: white;
+}
+
+.auth-logo h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+}
+
+.auth-logo h1 span {
+    background: linear-gradient(135deg, var(--primary-glow), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.auth-logo .subtitle {
+    color: var(--text-secondary);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+/* Tabs */
+.auth-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    background: var(--surface-light);
+    border-radius: 12px;
+    padding: 4px;
+    border: 1px solid var(--border);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    letter-spacing: 0.2px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+}
+
+.auth-tab.active {
+    background: var(--surface);
+    color: var(--white);
+    font-weight: 600;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-active);
+}
+
+.auth-tab:hover:not(.active) {
+    color: var(--text);
+    background: rgba(79, 70, 229, 0.05);
+}
+
+/* Formulaire */
+.auth-form {
+    animation: formIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes formIn {
+    from {
+        opacity: 0;
+        transform: translateX(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Champs */
+.auth-field {
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.field-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.auth-field label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: color 0.3s;
+}
+
+.auth-field:focus-within label {
+    color: var(--primary-glow);
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.auth-field input {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    outline: none;
+    letter-spacing: 0.2px;
+}
+
+.auth-field input::placeholder {
+    color: #475569;
+}
+
+.auth-field input:focus {
+    border-color: var(--border-active);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    background: var(--surface);
+}
+
+/* Barre de progression */
+.input-progress {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 1.5px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 1px;
+    transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-field input:focus ~ .input-progress {
+    width: 90%;
+}
+
+/* Indicateur de statut */
+.status-dot {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s ease;
+}
+
+.auth-field input:focus ~ .status-dot {
+    background: var(--primary-glow);
+    box-shadow: 0 0 8px var(--primary-glow);
+}
+
+.auth-field.success .status-dot {
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+}
+
+.auth-field.error .status-dot {
+    background: var(--error);
+    box-shadow: 0 0 8px var(--error);
+}
+
+.auth-field.error input {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.08);
+}
+
+/* Erreur */
+.auth-error-msg {
+    color: var(--error);
+    font-size: 11px;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: errorSlide 0.3s ease;
+    font-weight: 400;
+}
+
+@keyframes errorSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Options */
+.auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.checkbox-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-wrap input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 14px;
+    height: 14px;
+}
+
+.forgot-link {
+    color: var(--primary-glow);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: color 0.3s;
+    position: relative;
+}
+
+.forgot-link::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--primary-glow);
+    transition: width 0.3s;
+}
+
+.forgot-link:hover::after {
+    width: 100%;
+}
+
+/* Bouton */
+.auth-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary), #6366f1);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.6s;
+}
+
+.auth-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(79, 70, 229, 0.35);
+}
+
+.auth-submit-btn:hover::before {
+    left: 100%;
+}
+
+.auth-submit-btn:active {
+    transform: scale(0.97);
+    transition: transform 0.1s;
+}
+
+/* Loader */
+.loader-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.loader-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: white;
+    animation: loaderBounce 0.5s infinite alternate;
+}
+
+.loader-dots span:nth-child(2) { animation-delay: 0.12s; }
+.loader-dots span:nth-child(3) { animation-delay: 0.24s; }
+
+@keyframes loaderBounce {
+    to { transform: translateY(-6px); opacity: 0.3; }
+}
+
+/* Particules innovation */
+.spark-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+    animation: sparkUp 0.9s ease-out forwards;
+}
+
+@keyframes sparkUp {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate(var(--sx), var(--sy)) scale(0);
+        opacity: 0;
+    }
+}
