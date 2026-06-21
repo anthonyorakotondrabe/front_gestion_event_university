@@ -8,6 +8,7 @@ import LoginForm from './features/auth/components/LoginForm';
 import RegisterForm from './features/auth/components/RegisterForm';
 import Dashboard from './features/dashboard/components/Dashboard';
 import UserManagement from './features/users/components/UserManagement';
+import EventManagement from './features/events/components/EventManagement';
 import FiliereManagement from './features/catalog/components/filieres/FiliereManagement';
 import CategoryManagement from './features/catalog/components/categories/CategoryManagement';
 import LieuManagement from './features/catalog/components/lieux/LieuManagement';
@@ -39,7 +40,7 @@ function App() {
             <Route path="/admin/moderation" element={<Layout><PlaceholderPage title="Modération globale" /></Layout>} />
 
             {/* Organisateur Routes */}
-            <Route path="/events/manage" element={<Layout><PlaceholderPage title="Gestion de mes Événements" /></Layout>} />
+            <Route path="/events/manage" element={<Layout><EventManagement /></Layout>} />
             <Route path="/events/registrations" element={<Layout><PlaceholderPage title="Gestion des Inscriptions" /></Layout>} />
 
             {/* Etudiant Routes */}
