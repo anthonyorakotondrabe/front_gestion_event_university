@@ -114,7 +114,7 @@ const MyInscriptions = () => {
         ) : (
           filteredInscriptions.map((ins) => {
             const event = getEventDetails(ins.id_evenement);
-            const isCanceled = ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé';
+            const cannotCancel = ['Annule', 'Annulé', 'Confirme', 'Confirmé'].includes(ins.statut_inscription);
 
             return (
               <div key={ins.id_inscription} className="bg-white dark:bg-[#1f2028] p-5 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
@@ -126,9 +126,6 @@ const MyInscriptions = () => {
                     <div className="min-w-0">
                       <div className="text-sm font-black text-gray-900 dark:text-white truncate pr-2">
                         {event?.titre || 'Événement inconnu'}
-                      </div>
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
-                        ID: {ins.id_inscription}
                       </div>
                     </div>
                   </div>
@@ -159,7 +156,7 @@ const MyInscriptions = () => {
                   </div>
                   <button
                     onClick={() => handleCancel(ins.id_inscription)}
-                    disabled={cancelMutation.isPending || isCanceled}
+                    disabled={cancelMutation.isPending || cannotCancel}
                     className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl text-xs font-black uppercase tracking-tight transition-all active:scale-95 disabled:opacity-30"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,7 +194,7 @@ const MyInscriptions = () => {
               ) : (
                 filteredInscriptions.map((ins) => {
                   const event = getEventDetails(ins.id_evenement);
-                  const isCanceled = ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé';
+                  const cannotCancel = ['Annule', 'Annulé', 'Confirme', 'Confirmé'].includes(ins.statut_inscription);
 
                   return (
                     <tr key={ins.id_inscription} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
@@ -209,9 +206,6 @@ const MyInscriptions = () => {
                           <div className="min-w-0">
                             <div className="text-sm font-black text-gray-900 dark:text-white truncate max-w-[200px]">
                               {event?.titre || 'Événement inconnu'}
-                            </div>
-                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
-                              ID: {ins.id_inscription}
                             </div>
                           </div>
                         </div>
@@ -233,7 +227,7 @@ const MyInscriptions = () => {
                       <td className="px-6 py-5 text-right">
                         <button
                           onClick={() => handleCancel(ins.id_inscription)}
-                          disabled={cancelMutation.isPending || isCanceled}
+                          disabled={cancelMutation.isPending || cannotCancel}
                           className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all disabled:opacity-30 group/btn"
                           title="Annuler l'inscription"
                         >
