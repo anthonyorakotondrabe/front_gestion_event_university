@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useCreateEvent, useUpdateEvent } from '../hooks/useEvents';
 import { useCategories, useLieux } from '../../catalog/hooks/useCatalog';
+import { formatToLocalISO } from '../../../utils/dateUtils';
 import toast from 'react-hot-toast';
 
 const EventForm = ({ event, onClose }) => {
@@ -14,7 +15,7 @@ const EventForm = ({ event, onClose }) => {
     defaultValues: {
       titre: event?.titre || '',
       description: event?.description || '',
-      date_evenement: event?.date_evenement ? new Date(event.date_evenement).toISOString().slice(0, 16) : '',
+      date_evenement: event?.date_evenement ? formatToLocalISO(event.date_evenement) : '',
       prix: event?.prix || 0,
       capacite_max: event?.capacite_max || 10,
       id_categorie: event?.id_categorie || '',
