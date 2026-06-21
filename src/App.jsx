@@ -11,6 +11,7 @@ import UserManagement from './features/users/components/UserManagement';
 import EventManagement from './features/events/components/EventManagement';
 import EventCatalog from './features/events/components/EventCatalog';
 import RegistrationManagement from './features/inscriptions/components/RegistrationManagement';
+import MyInscriptions from './features/inscriptions/components/MyInscriptions';
 import FiliereManagement from './features/catalog/components/filieres/FiliereManagement';
 import CategoryManagement from './features/catalog/components/categories/CategoryManagement';
 import LieuManagement from './features/catalog/components/lieux/LieuManagement';
@@ -46,7 +47,7 @@ function App() {
             <Route path="/events/registrations" element={<Layout><RegistrationManagement /></Layout>} />
 
             {/* Etudiant Routes */}
-            <Route path="/my-inscriptions" element={<Layout><PlaceholderPage title="Mes Inscriptions" /></Layout>} />
+            <Route path="/my-inscriptions" element={<Layout><MyInscriptions /></Layout>} />
 
             {/* Common Private Routes */}
             <Route path="/profile" element={<Layout><PlaceholderPage title="Mon Profil Utilisateur" /></Layout>} />
