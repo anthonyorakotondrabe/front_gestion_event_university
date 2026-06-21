@@ -16,5 +16,17 @@ export const inscriptionService = {
   cancelInscription: async (id) => {
     const response = await axiosInstance.delete(`/inscriptions/${id}`);
     return response.data;
+  },
+  getAllInscriptions: async () => {
+    const response = await axiosInstance.get('/inscriptions');
+    return response.data;
+  },
+  updateInscriptionStatus: async (id, status) => {
+    const response = await axiosInstance.put(`/inscriptions/${id}`, { statut_inscription: status });
+    return response.data;
+  },
+  getEventInscriptions: async (eventId) => {
+    const response = await axiosInstance.get(`/evenements/${eventId}/inscriptions`);
+    return response.data;
   }
 };

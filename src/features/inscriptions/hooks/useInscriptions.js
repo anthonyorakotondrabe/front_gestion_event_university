@@ -16,6 +16,13 @@ export const useMyInscriptions = () => {
   });
 };
 
+export const useInscriptions = () => {
+  return useQuery({
+    queryKey: ['inscriptions'],
+    queryFn: () => inscriptionService.getAllInscriptions(),
+  });
+};
+
 export const useRegister = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -35,5 +42,24 @@ export const useCancelInscription = () => {
       queryClient.invalidateQueries({ queryKey: ['inscriptions'] });
       queryClient.invalidateQueries({ queryKey: ['events'] });
     },
+  });
+};
+
+export const useUpdateInscriptionStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status }) => inscriptionService.updateInscriptionStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inscriptions'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+};
+
+export const useEventInscriptions = (eventId) => {
+  return useQuery({
+    queryKey: ['inscriptions', 'event', eventId],
+    queryFn: () => inscriptionService.getEventInscriptions(eventId),
+    enabled: !!eventId,
   });
 };
