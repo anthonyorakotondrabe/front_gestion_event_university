@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import EventStatusBadge from './EventStatusBadge';
 import { useCategories, useLieux } from '../../catalog/hooks/useCatalog';
 import { useDeleteEvent, useUpdateEvent } from '../hooks/useEvents';
@@ -9,6 +9,8 @@ const EventList = ({ events, onEdit }) => {
   const { data: lieux } = useLieux();
   const deleteEvent = useDeleteEvent();
   const updateEvent = useUpdateEvent();
+  const [updatingStatusId, setUpdatingStatusId] = useState(null);
+  const [targetStatus, setTargetStatus] = useState(null);
 
   const getCategoryLabel = (id) => categories?.find(c => c.id_categorie === id)?.libelle || 'Inconnue';
   const getLieuLabel = (id) => {
@@ -26,13 +28,24 @@ const EventList = ({ events, onEdit }) => {
   };
 
   const handleStatusChange = (event, newStatus) => {
+    setUpdatingStatusId(event.id_evenement);
+    setTargetStatus(newStatus);
+
     const payload = {
       ...event,
       statut_evenement: newStatus
     };
     updateEvent.mutate({ id: event.id_evenement, data: payload }, {
-      onSuccess: () => toast.success(`Statut mis à jour : ${newStatus}`),
-      onError: () => toast.error('Erreur lors de la mise à jour du statut')
+      onSuccess: () => {
+        toast.success(`Statut mis à jour : ${newStatus}`);
+        setUpdatingStatusId(null);
+        setTargetStatus(null);
+      },
+      onError: () => {
+        toast.error('Erreur lors de la mise à jour du statut');
+        setUpdatingStatusId(null);
+        setTargetStatus(null);
+      }
     });
   };
 
@@ -111,20 +124,26 @@ const EventList = ({ events, onEdit }) => {
 
           <div className="pt-4 border-t border-gray-100 dark:border-white/5 flex flex-wrap gap-2">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest w-full mb-1">Changer le statut :</span>
-            {['Brouillon', 'Publie', 'Annule', 'Passe'].map((status) => (
-              <button
-                key={status}
-                onClick={() => handleStatusChange(event, status)}
-                disabled={event.statut_evenement === status}
-                className={`px-3 py-1.5 rounded-xl text-[10px] font-black transition-all ${
-                  event.statut_evenement === status
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                    : 'bg-gray-50 dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10'
-                }`}
-              >
-                {status === 'Publie' ? 'Publier' : status === 'Annule' ? 'Annuler' : status === 'Passe' ? 'Passer' : status}
-              </button>
-            ))}
+            {['Brouillon', 'Publie', 'Annule', 'Passe'].map((status) => {
+              const isUpdatingThis = updatingStatusId === event.id_evenement && targetStatus === status;
+              return (
+                <button
+                  key={status}
+                  onClick={() => handleStatusChange(event, status)}
+                  disabled={event.statut_evenement === status || (updatingStatusId === event.id_evenement)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black transition-all ${
+                    event.statut_evenement === status
+                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                      : 'bg-gray-50 dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  {isUpdatingThis && (
+                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  )}
+                  {status === 'Publie' ? 'Publier' : status === 'Annule' ? 'Annuler' : status === 'Passe' ? 'Passer' : status}
+                </button>
+              );
+            })}
           </div>
         </div>
       ))}
