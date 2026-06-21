@@ -5,6 +5,10 @@ export const inscriptionService = {
     const response = await axiosInstance.get(`/utilisateurs/${userId}/inscriptions`);
     return response.data;
   },
+  getMyInscriptions: async () => {
+    const response = await axiosInstance.get('/utilisateurs/me/inscriptions');
+    return response.data;
+  },
   registerToEvent: async (inscriptionData) => {
     const response = await axiosInstance.post('/inscriptions', inscriptionData);
     return response.data;
