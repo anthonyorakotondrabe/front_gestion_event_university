@@ -61,6 +61,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     <div className="mb-2">
       <NavSectionTitle>Espace Étudiant</NavSectionTitle>
       <SidebarItem to="/" label="Dashboard" onClick={onClose} />
+      <SidebarItem to="/events" label="Catalogue Événements" onClick={onClose} />
       <SidebarItem to="/my-inscriptions" label="Mes Inscriptions" onClick={onClose} />
     </div>
   );
