@@ -43,13 +43,73 @@ const InscriptionStatusBadge = ({ status }) => {
   );
 };
 
+const RegistrationCard = ({ ins, event, participant, isLoadingUser, getFiliereName, isUpdating, handleStatusChange }) => {
+  return (
+    <div className="bg-white dark:bg-[#1f2028] p-5 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm space-y-4 md:hidden">
+      <div className="flex justify-between items-start gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-500/20 shrink-0">
+            {isLoadingUser ? '...' : (participant?.nom || 'U').charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <div className="text-sm font-black text-gray-900 dark:text-white truncate">
+              {isLoadingUser ? 'Chargement...' : (participant?.nom || 'Utilisateur inconnu')}
+            </div>
+            <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-tight">
+              {isLoadingUser ? '...' : getFiliereName(participant?.id_filiere, participant)}
+            </div>
+          </div>
+        </div>
+        <InscriptionStatusBadge status={ins.statut_inscription} />
+      </div>
+
+      <div className="space-y-1">
+        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Événement</div>
+        <div className="text-xs font-bold text-gray-700 dark:text-gray-300 truncate">
+          {event?.titre}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between py-3 border-y border-gray-50 dark:border-white/5">
+        <div className="space-y-1">
+          <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Inscrit le</div>
+          <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
+            {formatToLocalTime(ins.date_inscription)}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleStatusChange(ins.id_inscription, 'Confirme')}
+            disabled={isUpdating || ins.statut_inscription === 'Confirme' || ins.statut_inscription === 'Confirmé'}
+            className="p-3 text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl transition-all active:scale-95 disabled:opacity-30"
+            title="Confirmer"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+          <button
+            onClick={() => handleStatusChange(ins.id_inscription, 'Annule')}
+            disabled={isUpdating || ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé'}
+            className="p-3 text-red-600 bg-red-50 dark:bg-red-500/10 rounded-xl transition-all active:scale-95 disabled:opacity-30"
+            title="Annuler"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const RegistrationRow = ({ ins, events, filieres, searchQuery, updatingId, handleStatusChange }) => {
-  // Fetch specific user data for this inscription
   const { data: participant, isLoading: isLoadingUser } = useQueries({
     queries: [{
       queryKey: ['users', ins.id_utilisateur],
       queryFn: () => userService.getUser(ins.id_utilisateur),
-      staleTime: 1000 * 60 * 30, // 30 minutes cache
+      staleTime: 1000 * 60 * 30,
     }]
   })[0];
 
@@ -72,61 +132,75 @@ const RegistrationRow = ({ ins, events, filieres, searchQuery, updatingId, handl
   if (!matchesSearch) return null;
 
   return (
-    <tr key={ins.id_inscription} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
-      <td className="px-6 py-5">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-500/20">
-            {isLoadingUser ? '...' : (participant?.nom || 'U').charAt(0).toUpperCase()}
+    <>
+      {/* Mobile Card */}
+      <RegistrationCard
+        ins={ins}
+        event={event}
+        participant={participant}
+        isLoadingUser={isLoadingUser}
+        getFiliereName={getFiliereName}
+        isUpdating={isUpdating}
+        handleStatusChange={handleStatusChange}
+      />
+
+      {/* Desktop Row */}
+      <tr className="hidden md:table-row hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+        <td className="px-6 py-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-500/20">
+              {isLoadingUser ? '...' : (participant?.nom || 'U').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div className="text-sm font-black text-gray-900 dark:text-white">
+                {isLoadingUser ? 'Chargement...' : (participant?.nom || 'Utilisateur inconnu')}
+              </div>
+              <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-tight">
+                {isLoadingUser ? '...' : getFiliereName(participant?.id_filiere, participant)}
+              </div>
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+                {isLoadingUser ? '...' : (participant?.email || 'Email non renseigné')}
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="text-sm font-black text-gray-900 dark:text-white">
-              {isLoadingUser ? 'Chargement...' : (participant?.nom || 'Utilisateur inconnu')}
-            </div>
-            <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-tight">
-              {isLoadingUser ? '...' : getFiliereName(participant?.id_filiere, participant)}
-            </div>
-            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
-              {isLoadingUser ? '...' : (participant?.email || 'Email non renseigné')}
-            </div>
+        </td>
+        <td className="px-6 py-5">
+          <div className="text-sm font-bold text-gray-700 dark:text-gray-300 max-w-xs truncate">
+            {event?.titre}
           </div>
-        </div>
-      </td>
-      <td className="px-6 py-5">
-        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 max-w-xs truncate">
-          {event?.titre}
-        </div>
-      </td>
-      <td className="px-6 py-5 text-sm font-medium text-gray-500 dark:text-gray-400">
-        {formatToLocalTime(ins.date_inscription)}
-      </td>
-      <td className="px-6 py-5 text-center">
-        <InscriptionStatusBadge status={ins.statut_inscription} />
-      </td>
-      <td className="px-6 py-5">
-        <div className="flex items-center justify-end gap-2">
-          <button
-            onClick={() => handleStatusChange(ins.id_inscription, 'Confirme')}
-            disabled={isUpdating || ins.statut_inscription === 'Confirme' || ins.statut_inscription === 'Confirmé'}
-            className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-xl transition-all disabled:opacity-30"
-            title="Confirmer"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-            </svg>
-          </button>
-          <button
-            onClick={() => handleStatusChange(ins.id_inscription, 'Annule')}
-            disabled={isUpdating || ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé'}
-            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all disabled:opacity-30"
-            title="Annuler"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </td>
-    </tr>
+        </td>
+        <td className="px-6 py-5 text-sm font-medium text-gray-500 dark:text-gray-400">
+          {formatToLocalTime(ins.date_inscription)}
+        </td>
+        <td className="px-6 py-5 text-center">
+          <InscriptionStatusBadge status={ins.statut_inscription} />
+        </td>
+        <td className="px-6 py-5">
+          <div className="flex items-center justify-end gap-2">
+            <button
+              onClick={() => handleStatusChange(ins.id_inscription, 'Confirme')}
+              disabled={isUpdating || ins.statut_inscription === 'Confirme' || ins.statut_inscription === 'Confirmé'}
+              className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-xl transition-all disabled:opacity-30"
+              title="Confirmer"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+            </button>
+            <button
+              onClick={() => handleStatusChange(ins.id_inscription, 'Annule')}
+              disabled={isUpdating || ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé'}
+              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all disabled:opacity-30"
+              title="Annuler"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </>
   );
 };
 
@@ -139,12 +213,10 @@ const RegistrationManagement = () => {
 
   const [updatingId, setUpdatingId] = useState(null);
 
-  // Filter events: only those created by the current user
   const organizerEvents = useMemo(() =>
     events?.filter(event => event.createur_id === currentUser?.id_utilisateur) || []
   , [events, currentUser]);
 
-  // Fetch inscriptions for each of the organizer's events
   const inscriptionsQueries = useQueries({
     queries: organizerEvents.map(event => ({
       queryKey: ['inscriptions', 'event', event.id_evenement],
@@ -154,7 +226,6 @@ const RegistrationManagement = () => {
 
   const isLoadingInscriptions = inscriptionsQueries.some(query => query.isLoading);
 
-  // Flatten all inscriptions from all queries
   const allInscriptions = useMemo(() => {
     return inscriptionsQueries
       .filter(query => query.data)
@@ -187,32 +258,46 @@ const RegistrationManagement = () => {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
+          <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
             Gestion des <span className="text-indigo-600">Inscriptions</span>
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 font-medium">
+          <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium">
             Acceptez ou refusez les inscriptions à vos événements.
           </p>
         </div>
-      </div>
-
-      {/* Stats Bar */}
-      <div className="flex justify-end bg-white dark:bg-[#1f2028] p-4 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
-        <div className="px-6 py-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl border border-indigo-100 dark:border-indigo-500/20">
-          <span className="text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase">
-            {allInscriptions?.length || 0} Inscriptions trouvées
+        <div className="flex items-center bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 rounded-2xl border border-indigo-100 dark:border-indigo-500/20 w-fit">
+          <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase">
+            {allInscriptions?.length || 0} Inscriptions
           </span>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-white dark:bg-[#1f2028] rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden">
+      <div className="md:bg-white md:dark:bg-[#1f2028] md:rounded-3xl md:border md:border-gray-100 md:dark:border-white/5 md:shadow-sm md:overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <div className="grid grid-cols-1 gap-4 md:hidden">
+            {!allInscriptions || allInscriptions.length === 0 ? (
+              <div className="bg-white dark:bg-[#1f2028] p-8 rounded-3xl border border-dashed border-gray-200 dark:border-white/10 text-center">
+                <p className="text-gray-500 dark:text-gray-400 font-medium text-sm">Aucune inscription trouvée.</p>
+              </div>
+            ) : (
+              allInscriptions.map((ins) => (
+                <RegistrationRow
+                  key={ins.id_inscription}
+                  ins={ins}
+                  events={events}
+                  filieres={filieres}
+                  searchQuery={searchQuery}
+                  updatingId={updatingId}
+                  handleStatusChange={handleStatusChange}
+                />
+              ))
+            )}
+          </div>
+
+          <table className="hidden md:table w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-gray-100 dark:border-white/5">
                 <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Participant</th>
