@@ -13,6 +13,15 @@ export const userService = {
   },
 
   /**
+   * Récupère un utilisateur spécifique par son ID.
+   * @param {string} id - L'identifiant de l'utilisateur.
+   */
+  getUser: async (id) => {
+    const response = await axiosInstance.get(`/utilisateurs/${id}`);
+    return response.data;
+  },
+
+  /**
    * Crée un nouvel utilisateur via l'endpoint d'inscription.
    * @param {Object} userData - Les données de l'utilisateur (nom, email, password, role, id_filiere).
    */

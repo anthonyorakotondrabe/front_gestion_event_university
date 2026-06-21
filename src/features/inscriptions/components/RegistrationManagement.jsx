@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useUpdateInscriptionStatus } from '../hooks/useInscriptions';
 import { useEvents } from '../../events/hooks/useEvents';
-import { useUsersList } from '../../users/hooks/useUsers';
+import { useFilieres } from '../../catalog/hooks/useCatalog';
 import { useUser } from '../../auth/hooks/useAuth';
+import { userService } from '../../users/api/userService';
 import { useSearch } from '../../../context/SearchContext';
 import { formatToLocalTime } from '../../../utils/dateUtils';
 import { inscriptionService } from '../api/inscriptionService';
@@ -42,10 +43,97 @@ const InscriptionStatusBadge = ({ status }) => {
   );
 };
 
+const RegistrationRow = ({ ins, events, filieres, searchQuery, updatingId, handleStatusChange }) => {
+  // Fetch specific user data for this inscription
+  const { data: participant, isLoading: isLoadingUser } = useQueries({
+    queries: [{
+      queryKey: ['users', ins.id_utilisateur],
+      queryFn: () => userService.getUser(ins.id_utilisateur),
+      staleTime: 1000 * 60 * 30, // 30 minutes cache
+    }]
+  })[0];
+
+  const event = events?.find(e => e.id_evenement === ins.id_evenement);
+  const isUpdating = updatingId === ins.id_inscription;
+
+  const getFiliereName = (filiereId, user) => {
+    if (user?.filiere?.nom_filiere) return user.filiere.nom_filiere;
+    const foundFiliere = filieres?.find(f => f.id_filiere === filiereId);
+    if (foundFiliere) return foundFiliere.nom_filiere;
+    return 'Filière inconnue';
+  };
+
+  const participantName = participant?.nom || 'Chargement...';
+  const matchesSearch =
+    event?.titre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    participantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    ins.statut_inscription?.toLowerCase().includes(searchQuery.toLowerCase());
+
+  if (!matchesSearch) return null;
+
+  return (
+    <tr key={ins.id_inscription} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+      <td className="px-6 py-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-500/20">
+            {isLoadingUser ? '...' : (participant?.nom || 'U').charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div className="text-sm font-black text-gray-900 dark:text-white">
+              {isLoadingUser ? 'Chargement...' : (participant?.nom || 'Utilisateur inconnu')}
+            </div>
+            <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-tight">
+              {isLoadingUser ? '...' : getFiliereName(participant?.id_filiere, participant)}
+            </div>
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+              {isLoadingUser ? '...' : (participant?.email || 'Email non renseigné')}
+            </div>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-5">
+        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 max-w-xs truncate">
+          {event?.titre}
+        </div>
+      </td>
+      <td className="px-6 py-5 text-sm font-medium text-gray-500 dark:text-gray-400">
+        {formatToLocalTime(ins.date_inscription)}
+      </td>
+      <td className="px-6 py-5 text-center">
+        <InscriptionStatusBadge status={ins.statut_inscription} />
+      </td>
+      <td className="px-6 py-5">
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={() => handleStatusChange(ins.id_inscription, 'Confirme')}
+            disabled={isUpdating || ins.statut_inscription === 'Confirme' || ins.statut_inscription === 'Confirmé'}
+            className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-xl transition-all disabled:opacity-30"
+            title="Confirmer"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+          <button
+            onClick={() => handleStatusChange(ins.id_inscription, 'Annule')}
+            disabled={isUpdating || ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé'}
+            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all disabled:opacity-30"
+            title="Annuler"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+};
+
 const RegistrationManagement = () => {
   const { data: currentUser } = useUser();
   const { data: events, isLoading: isLoadingEvents } = useEvents();
-  const { data: users, isLoading: isLoadingUsers } = useUsersList();
+  const { data: filieres, isLoading: isLoadingFilieres } = useFilieres();
   const updateStatusMutation = useUpdateInscriptionStatus();
   const { searchQuery } = useSearch();
 
@@ -73,20 +161,6 @@ const RegistrationManagement = () => {
       .flatMap(query => query.data);
   }, [inscriptionsQueries]);
 
-  const filteredInscriptions = useMemo(() => {
-    return allInscriptions?.filter(ins => {
-      const event = events?.find(e => e.id_evenement === ins.id_evenement);
-      const user = users?.find(u => u.id_utilisateur === ins.id_utilisateur);
-
-      const matchesSearch =
-        event?.titre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user?.nom?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        ins.statut_inscription?.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return matchesSearch;
-    });
-  }, [allInscriptions, events, users, searchQuery]);
-
   const handleStatusChange = (id, newStatus) => {
     setUpdatingId(id);
     updateStatusMutation.mutate({ id, status: newStatus }, {
@@ -101,7 +175,7 @@ const RegistrationManagement = () => {
     });
   };
 
-  const isLoading = isLoadingEvents || isLoadingUsers || isLoadingInscriptions;
+  const isLoading = isLoadingEvents || isLoadingInscriptions || isLoadingFilieres;
 
   if (isLoading) {
     return (
@@ -130,7 +204,7 @@ const RegistrationManagement = () => {
       <div className="flex justify-end bg-white dark:bg-[#1f2028] p-4 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
         <div className="px-6 py-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl border border-indigo-100 dark:border-indigo-500/20">
           <span className="text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase">
-            {filteredInscriptions?.length || 0} Inscriptions trouvées
+            {allInscriptions?.length || 0} Inscriptions trouvées
           </span>
         </div>
       </div>
@@ -149,69 +223,24 @@ const RegistrationManagement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-              {!filteredInscriptions || filteredInscriptions.length === 0 ? (
+              {!allInscriptions || allInscriptions.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400 font-medium">
                     Aucune inscription trouvée.
                   </td>
                 </tr>
               ) : (
-                filteredInscriptions.map((ins) => {
-                  const event = events?.find(e => e.id_evenement === ins.id_evenement);
-                  const participant = users?.find(u => u.id_utilisateur === ins.id_utilisateur);
-                  const isUpdating = updatingId === ins.id_inscription;
-
-                  return (
-                    <tr key={ins.id_inscription} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-500/20">
-                            {participant?.nom?.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="text-sm font-black text-gray-900 dark:text-white">{participant?.nom}</div>
-                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">{participant?.email}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 max-w-xs truncate">
-                          {event?.titre}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {formatToLocalTime(ins.date_inscription)}
-                      </td>
-                      <td className="px-6 py-5 text-center">
-                        <InscriptionStatusBadge status={ins.statut_inscription} />
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleStatusChange(ins.id_inscription, 'Confirme')}
-                            disabled={isUpdating || ins.statut_inscription === 'Confirme' || ins.statut_inscription === 'Confirmé'}
-                            className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-xl transition-all disabled:opacity-30"
-                            title="Confirmer"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => handleStatusChange(ins.id_inscription, 'Annule')}
-                            disabled={isUpdating || ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé'}
-                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all disabled:opacity-30"
-                            title="Annuler"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
+                allInscriptions.map((ins) => (
+                  <RegistrationRow
+                    key={ins.id_inscription}
+                    ins={ins}
+                    events={events}
+                    filieres={filieres}
+                    searchQuery={searchQuery}
+                    updatingId={updatingId}
+                    handleStatusChange={handleStatusChange}
+                  />
+                ))
               )}
             </tbody>
           </table>

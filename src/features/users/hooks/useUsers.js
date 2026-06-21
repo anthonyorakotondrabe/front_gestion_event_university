@@ -13,6 +13,17 @@ export const useUsersList = () => {
 };
 
 /**
+ * Hook pour récupérer un utilisateur spécifique.
+ */
+export const useUserById = (id) => {
+  return useQuery({
+    queryKey: ['users', id],
+    queryFn: () => userService.getUser(id),
+    enabled: !!id,
+  });
+};
+
+/**
  * Hook pour la création d'un utilisateur.
  */
 export const useCreateUser = () => {
