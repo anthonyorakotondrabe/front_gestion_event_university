@@ -87,30 +87,95 @@ const MyInscriptions = () => {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
+          <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
             Mes <span className="text-indigo-600">Inscriptions</span>
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 font-medium">
+          <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium">
             Retrouvez tous les événements auxquels vous participez.
           </p>
         </div>
-      </div>
-
-      {/* Stats Bar */}
-      <div className="flex justify-end bg-white dark:bg-[#1f2028] p-4 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
-        <div className="px-6 py-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl border border-indigo-100 dark:border-indigo-500/20">
-          <span className="text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase">
+        <div className="flex items-center bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 rounded-2xl border border-indigo-100 dark:border-indigo-500/20 w-fit">
+          <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase">
             {filteredInscriptions?.length || 0} Inscriptions
           </span>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-white dark:bg-[#1f2028] rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden">
+      {/* Main Content - Card list for Mobile, Table for Desktop */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        {!filteredInscriptions || filteredInscriptions.length === 0 ? (
+          <div className="bg-white dark:bg-[#1f2028] p-8 rounded-3xl border border-dashed border-gray-200 dark:border-white/10 text-center">
+            <p className="text-gray-500 dark:text-gray-400 font-medium text-sm">Vous n'avez aucune inscription pour le moment.</p>
+          </div>
+        ) : (
+          filteredInscriptions.map((ins) => {
+            const event = getEventDetails(ins.id_evenement);
+            const isCanceled = ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé';
+
+            return (
+              <div key={ins.id_inscription} className="bg-white dark:bg-[#1f2028] p-5 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
+                <div className="flex justify-between items-start gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-500/20 shrink-0">
+                      {event?.titre?.charAt(0).toUpperCase() || 'E'}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-black text-gray-900 dark:text-white truncate pr-2">
+                        {event?.titre || 'Événement inconnu'}
+                      </div>
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+                        ID: {ins.id_inscription}
+                      </div>
+                    </div>
+                  </div>
+                  <InscriptionStatusBadge status={ins.statut_inscription} />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 py-3 border-y border-gray-50 dark:border-white/5">
+                  <div className="space-y-1">
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Date & Heure</div>
+                    <div className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                      {event ? formatToLocalTime(event.date_evenement) : '---'}
+                    </div>
+                  </div>
+                  <div className="space-y-1 text-right">
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Lieu</div>
+                    <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate">
+                      {event ? getLieuLabel(event.id_lieu) : '---'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Inscrit le</div>
+                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                      {formatToLocalTime(ins.date_inscription)}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleCancel(ins.id_inscription)}
+                    disabled={cancelMutation.isPending || isCanceled}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl text-xs font-black uppercase tracking-tight transition-all active:scale-95 disabled:opacity-30"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white dark:bg-[#1f2028] rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -132,6 +197,8 @@ const MyInscriptions = () => {
               ) : (
                 filteredInscriptions.map((ins) => {
                   const event = getEventDetails(ins.id_evenement);
+                  const isCanceled = ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé';
+
                   return (
                     <tr key={ins.id_inscription} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                       <td className="px-6 py-5">
@@ -166,7 +233,7 @@ const MyInscriptions = () => {
                       <td className="px-6 py-5 text-right">
                         <button
                           onClick={() => handleCancel(ins.id_inscription)}
-                          disabled={cancelMutation.isPending || ins.statut_inscription === 'Annule' || ins.statut_inscription === 'Annulé'}
+                          disabled={cancelMutation.isPending || isCanceled}
                           className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all disabled:opacity-30 group/btn"
                           title="Annuler l'inscription"
                         >
