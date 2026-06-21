@@ -9,6 +9,7 @@ import RegisterForm from './features/auth/components/RegisterForm';
 import Dashboard from './features/dashboard/components/Dashboard';
 import UserManagement from './features/users/components/UserManagement';
 import EventManagement from './features/events/components/EventManagement';
+import EventCatalog from './features/events/components/EventCatalog';
 import FiliereManagement from './features/catalog/components/filieres/FiliereManagement';
 import CategoryManagement from './features/catalog/components/categories/CategoryManagement';
 import LieuManagement from './features/catalog/components/lieux/LieuManagement';
@@ -50,7 +51,7 @@ function App() {
             <Route path="/profile" element={<Layout><PlaceholderPage title="Mon Profil Utilisateur" /></Layout>} />
 
             {/* Public Routes */}
-            <Route path="/events" element={<Layout><PlaceholderPage title="Explorer les Événements" /></Layout>} />
+            <Route path="/events" element={<Layout><EventCatalog /></Layout>} />
 
             {/* Auth Routes with Tech/Innovation Layout */}
             <Route path="/login" element={<AuthLayout><LoginForm /></AuthLayout>} />
