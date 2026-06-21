@@ -20,5 +20,9 @@ export const eventService = {
   deleteEvent: async (id) => {
     const response = await axiosInstance.delete(`/evenements/${id}`);
     return response.data;
+  },
+  registerToEvent: async (id) => {
+    const response = await axiosInstance.post(`/evenements/${id}/inscrire`);
+    return response.data;
   }
 };

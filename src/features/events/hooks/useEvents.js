@@ -45,3 +45,14 @@ export const useDeleteEvent = () => {
     },
   });
 };
+
+export const useRegisterForEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => eventService.registerToEvent(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['inscriptions'] });
+    },
+  });
+};

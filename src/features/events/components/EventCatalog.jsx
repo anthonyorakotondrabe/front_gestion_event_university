@@ -1,14 +1,42 @@
-import { useEvents } from '../hooks/useEvents';
+import { useEvents, useRegisterForEvent } from '../hooks/useEvents';
 import { useCategories, useLieux } from '../../catalog/hooks/useCatalog';
 import EventStatusBadge from './EventStatusBadge';
 import { useSearch } from '../../../context/SearchContext';
+import { useUser } from '../../auth/hooks/useAuth';
 import { formatToLocalTime } from '../../../utils/dateUtils';
+import toast from 'react-hot-toast';
 
 const EventCatalog = () => {
+  const { data: user } = useUser();
   const { data: events, isLoading, error } = useEvents();
   const { data: categories } = useCategories();
   const { data: lieux } = useLieux();
   const { searchQuery } = useSearch();
+  const registerMutation = useRegisterForEvent();
+
+  const isEtudiant = user?.role?.toLowerCase().trim() === 'etudiant' || user?.role?.toLowerCase().trim() === 'étudiant';
+
+  const handleRegister = (eventId) => {
+    if (!user) {
+      toast.error('Vous devez être connecté pour vous inscrire');
+      return;
+    }
+
+    if (!isEtudiant) {
+      toast.error('Seuls les étudiants peuvent s\'inscrire aux événements');
+      return;
+    }
+
+    registerMutation.mutate(eventId, {
+      onSuccess: () => {
+        toast.success('Inscription réussie !');
+      },
+      onError: (error) => {
+        const message = error.response?.data?.detail || 'Erreur lors de l\'inscription';
+        toast.error(message);
+      }
+    });
+  };
 
   const getCategoryLabel = (id) => categories?.find(c => c.id_categorie === id)?.libelle || 'Inconnue';
   const getLieuLabel = (id) => {
@@ -122,9 +150,23 @@ const EventCatalog = () => {
               </div>
 
               <div className="pt-4 border-t border-gray-100 dark:border-white/5">
-                <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl transition-all active:scale-95 shadow-lg shadow-indigo-500/20">
-                  S'inscrire à l'événement
-                </button>
+                {isEtudiant ? (
+                  <button
+                    onClick={() => handleRegister(event.id_evenement)}
+                    disabled={registerMutation.isPending}
+                    className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl transition-all active:scale-95 shadow-lg shadow-indigo-500/20 disabled:opacity-70 flex items-center justify-center gap-2"
+                  >
+                    {registerMutation.isPending && registerMutation.variables === event.id_evenement ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      'S\'inscrire à l\'événement'
+                    )}
+                  </button>
+                ) : (
+                  <div className="w-full py-3 bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 font-bold rounded-xl text-center text-xs">
+                    Inscriptions réservées aux étudiants
+                  </div>
+                )}
               </div>
             </div>
           ))}
