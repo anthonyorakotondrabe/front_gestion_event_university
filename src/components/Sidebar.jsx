@@ -1,5 +1,6 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useUser, useLogout } from '../features/auth/hooks/useAuth';
+import { useConfirm } from '../context/ModalContext';
 
 const SidebarItem = ({ to, label, onClick, icon }) => (
   <NavLink
@@ -27,11 +28,16 @@ const NavSectionTitle = ({ children }) => (
 const Sidebar = ({ isOpen, onClose }) => {
   const { data: user } = useUser();
   const logout = useLogout();
+  const confirm = useConfirm();
   const navigate = useNavigate();
   const role = user?.role?.toLowerCase().trim() || '';
 
-  const handleLogout = () => {
-    if (window.confirm('Voulez-vous vraiment vous déconnecter ?')) {
+  const handleLogout = async () => {
+    if (await confirm('Voulez-vous vraiment vous déconnecter ?', {
+      title: 'Déconnexion',
+      confirmLabel: 'Se déconnecter',
+      type: 'danger'
+    })) {
       logout();
       navigate('/login');
       onClose();

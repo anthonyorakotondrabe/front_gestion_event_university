@@ -1,13 +1,19 @@
 import { useDeleteFiliere } from '../../hooks/useCatalog';
+import { useConfirm } from '../../../../context/ModalContext';
 
 /**
  * Composant pour afficher la liste des filières avec le même design que la gestion utilisateur.
  */
 const FiliereList = ({ filieres, onEdit }) => {
   const deleteFiliere = useDeleteFiliere();
+  const confirm = useConfirm();
 
-  const handleDelete = (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette filière ?')) {
+  const handleDelete = async (id) => {
+    if (await confirm('Êtes-vous sûr de vouloir supprimer cette filière ? Cette action pourrait affecter les étudiants associés.', {
+      title: 'Suppression de filière',
+      confirmLabel: 'Supprimer',
+      type: 'danger'
+    })) {
       deleteFiliere.mutate(id);
     }
   };

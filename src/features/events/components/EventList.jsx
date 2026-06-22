@@ -3,6 +3,7 @@ import EventStatusBadge from './EventStatusBadge';
 import { useCategories, useLieux } from '../../catalog/hooks/useCatalog';
 import { useDeleteEvent, useUpdateEvent } from '../hooks/useEvents';
 import { formatToLocalTime } from '../../../utils/dateUtils';
+import { useConfirm } from '../../../context/ModalContext';
 import toast from 'react-hot-toast';
 
 const EventList = ({ events, onEdit }) => {
@@ -10,6 +11,7 @@ const EventList = ({ events, onEdit }) => {
   const { data: lieux } = useLieux();
   const deleteEvent = useDeleteEvent();
   const updateEvent = useUpdateEvent();
+  const confirm = useConfirm();
   const [updatingStatusId, setUpdatingStatusId] = useState(null);
   const [targetStatus, setTargetStatus] = useState(null);
 
@@ -19,8 +21,12 @@ const EventList = ({ events, onEdit }) => {
     return lieu ? `${lieu.nom_lieu}, ${lieu.ville}` : 'Inconnu';
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
+  const handleDelete = async (id) => {
+    if (await confirm('Êtes-vous sûr de vouloir supprimer cet événement ? Cette action supprimera également toutes les inscriptions liées.', {
+      title: 'Suppression d\'événement',
+      confirmLabel: 'Supprimer',
+      type: 'danger'
+    })) {
       deleteEvent.mutate(id, {
         onSuccess: () => toast.success('Événement supprimé'),
         onError: () => toast.error('Erreur lors de la suppression')

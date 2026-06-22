@@ -3,6 +3,7 @@ import { useEvents } from '../../events/hooks/useEvents';
 import { useLieux } from '../../catalog/hooks/useCatalog';
 import { useSearch } from '../../../context/SearchContext';
 import { formatToLocalTime } from '../../../utils/dateUtils';
+import { useConfirm } from '../../../context/ModalContext';
 import toast from 'react-hot-toast';
 
 const InscriptionStatusBadge = ({ status }) => {
@@ -43,10 +44,15 @@ const MyInscriptions = () => {
   const { data: events, isLoading: isLoadingEvents } = useEvents();
   const { data: lieux } = useLieux();
   const { searchQuery } = useSearch();
+  const confirm = useConfirm();
   const cancelMutation = useCancelInscription();
 
-  const handleCancel = (id) => {
-    if (window.confirm('Voulez-vous vraiment annuler cette inscription ?')) {
+  const handleCancel = async (id) => {
+    if (await confirm('Voulez-vous vraiment annuler cette inscription ?', {
+      title: 'Annulation d\'inscription',
+      confirmLabel: 'Annuler l\'inscription',
+      type: 'danger'
+    })) {
       cancelMutation.mutate(id, {
         onSuccess: () => {
           toast.success('Inscription annulée avec succès');

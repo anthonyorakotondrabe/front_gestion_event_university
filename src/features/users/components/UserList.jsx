@@ -1,17 +1,23 @@
 import { useUsersList, useDeleteUser } from '../hooks/useUsers';
 import { useFilieres } from '../../catalog/hooks/useCatalog';
+import { useConfirm } from '../../../context/ModalContext';
 
 const UserList = ({ onEdit, searchQuery }) => {
   const { data: users, isLoading, isError } = useUsersList();
   const { data: filieres } = useFilieres();
   const deleteUser = useDeleteUser();
+  const confirm = useConfirm();
 
   const getFiliereName = (id) => {
     return filieres?.find(f => f.id_filiere === id)?.nom_filiere || 'N/A';
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+  const handleDelete = async (id) => {
+    if (await confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.', {
+      title: 'Suppression d\'utilisateur',
+      confirmLabel: 'Supprimer',
+      type: 'danger'
+    })) {
       deleteUser.mutate(id);
     }
   };

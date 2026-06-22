@@ -16,6 +16,7 @@ import FiliereManagement from './features/catalog/components/filieres/FiliereMan
 import CategoryManagement from './features/catalog/components/categories/CategoryManagement';
 import LieuManagement from './features/catalog/components/lieux/LieuManagement';
 import { SearchProvider } from './context/SearchContext';
+import { ModalProvider } from './context/ModalContext';
 import './App.css';
 
 // Placeholder components for empty menus
@@ -29,9 +30,10 @@ const PlaceholderPage = ({ title }) => (
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SearchProvider>
-        <Router>
-          <Routes>
+      <ModalProvider>
+        <SearchProvider>
+          <Router>
+            <Routes>
             {/* Main App Routes with Layout & Sidebar (conditional) */}
             <Route path="/" element={<Layout><Dashboard /></Layout>} />
 
@@ -61,6 +63,7 @@ function App() {
           </Routes>
         </Router>
       </SearchProvider>
+      </ModalProvider>
       <Toaster position="top-right" />
     </QueryClientProvider>
   );

@@ -1,13 +1,19 @@
 import { useDeleteCategory } from '../../hooks/useCatalog';
+import { useConfirm } from '../../../../context/ModalContext';
 
 /**
  * Composant pour afficher la liste des catégories avec le même design que la gestion utilisateur.
  */
 const CategoryList = ({ categories, onEdit }) => {
   const deleteCategory = useDeleteCategory();
+  const confirm = useConfirm();
 
-  const handleDelete = (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
+  const handleDelete = async (id) => {
+    if (await confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette action pourrait affecter les événements associés.', {
+      title: 'Suppression de catégorie',
+      confirmLabel: 'Supprimer',
+      type: 'danger'
+    })) {
       deleteCategory.mutate(id);
     }
   };

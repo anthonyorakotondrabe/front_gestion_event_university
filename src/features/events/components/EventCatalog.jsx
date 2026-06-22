@@ -5,6 +5,7 @@ import EventStatusBadge from './EventStatusBadge';
 import { useSearch } from '../../../context/SearchContext';
 import { useUser } from '../../auth/hooks/useAuth';
 import { formatToLocalTime } from '../../../utils/dateUtils';
+import { useConfirm } from '../../../context/ModalContext';
 import toast from 'react-hot-toast';
 
 const EventCatalog = () => {
@@ -14,6 +15,7 @@ const EventCatalog = () => {
   const { data: lieux } = useLieux();
   const { searchQuery } = useSearch();
   const { data: userInscriptions } = useMyInscriptions();
+  const confirm = useConfirm();
   const registerMutation = useRegisterForEvent();
   const cancelMutation = useCancelInscription();
 
@@ -41,8 +43,12 @@ const EventCatalog = () => {
     });
   };
 
-  const handleCancel = (inscriptionId) => {
-    if (window.confirm('Voulez-vous vraiment annuler votre inscription ?')) {
+  const handleCancel = async (inscriptionId) => {
+    if (await confirm('Voulez-vous vraiment annuler votre inscription ?', {
+      title: 'Annulation d\'inscription',
+      confirmLabel: 'Annuler',
+      type: 'danger'
+    })) {
       cancelMutation.mutate(inscriptionId, {
         onSuccess: () => toast.success('Inscription annulée'),
         onError: (err) => toast.error(err.response?.data?.detail || 'Erreur lors de l\'annulation')

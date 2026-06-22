@@ -1,13 +1,19 @@
 import { useDeleteLieu } from '../../hooks/useCatalog';
+import { useConfirm } from '../../../../context/ModalContext';
 
 /**
  * Composant pour afficher la liste des lieux avec le design standard admin.
  */
 const LieuList = ({ lieux, onEdit }) => {
   const deleteLieu = useDeleteLieu();
+  const confirm = useConfirm();
 
-  const handleDelete = (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce lieu ?')) {
+  const handleDelete = async (id) => {
+    if (await confirm('Êtes-vous sûr de vouloir supprimer ce lieu ? Cette action pourrait affecter les événements associés.', {
+      title: 'Suppression de lieu',
+      confirmLabel: 'Supprimer',
+      type: 'danger'
+    })) {
       deleteLieu.mutate(id);
     }
   };
