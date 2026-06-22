@@ -3,6 +3,7 @@ import { useUser } from '../../auth/hooks/useAuth';
 import { Navigate, Link } from 'react-router-dom';
 import { useEvents } from '../../events/hooks/useEvents';
 import { useMyInscriptions } from '../../inscriptions/hooks/useInscriptions';
+import { useUsersList } from '../../users/hooks/useUsers';
 import { formatRelativeTime } from '../../../utils/dateUtils';
 
 const DashboardCard = ({ title, description, to, icon, colorClass }) => (
@@ -21,56 +22,83 @@ const DashboardCard = ({ title, description, to, icon, colorClass }) => (
   </Link>
 );
 
-const AdminDashboard = ({ user }) => (
-  <div className="space-y-8">
-    <div className="relative overflow-hidden bg-white dark:bg-[#1f2028] rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-500/10 border border-gray-100 dark:border-white/5">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+const AdminDashboard = ({ user }) => {
+  const { data: events } = useEvents();
+  const { data: users } = useUsersList();
 
-      <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div className="space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-full border border-indigo-100 dark:border-indigo-500/20">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-            </span>
-            <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Panel de contrôle</span>
+  const totalStudents = users?.filter(u =>
+    u.role?.toLowerCase().trim() === 'etudiant' ||
+    u.role?.toLowerCase().trim() === 'étudiant'
+  )?.length || 0;
+
+  const ongoingEvents = events?.filter(e =>
+    e.statut_evenement === 'Publie'
+  )?.length || 0;
+
+  return (
+    <div className="space-y-8">
+      <div className="relative overflow-hidden bg-white dark:bg-[#1f2028] rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-500/10 border border-gray-100 dark:border-white/5">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-full border border-indigo-100 dark:border-indigo-500/20">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+              </span>
+              <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Panel de contrôle</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
+              Bonjour, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Admin {user.nom}</span>
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl font-medium">
+              Prêt à superviser la plateforme aujourd'hui ? Tous les systèmes sont opérationnels.
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
-            Bonjour, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Admin {user.nom}</span>
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl font-medium">
-            Prêt à superviser la plateforme aujourd'hui ? Tous les systèmes sont opérationnels.
-          </p>
+
+          <div className="hidden lg:block">
+            <div className="flex gap-4">
+              <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 text-center">
+                <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{totalStudents}</div>
+                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Étudiants</div>
+              </div>
+              <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 text-center">
+                <div className="text-2xl font-black text-purple-600 dark:text-purple-400">{ongoingEvents}</div>
+                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Événements en cours</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <DashboardCard
-        title="Utilisateurs"
-        description="Gérez les comptes, les rôles et les accès des membres."
-        to="/admin/users"
-        colorClass="bg-blue-500"
-        icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}
-      />
-      <DashboardCard
-        title="Filières"
-        description="Configurez et organisez les différentes filières académiques."
-        to="/admin/filieres"
-        colorClass="bg-purple-500"
-        icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" /></svg>}
-      />
-      <DashboardCard
-        title="Modération"
-        description="Surveillez et gérez tous les événements de la plateforme."
-        to="/admin/moderation"
-        colorClass="bg-red-500"
-        icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <DashboardCard
+          title="Utilisateurs"
+          description="Gérez les comptes, les rôles et les accès des membres."
+          to="/admin/users"
+          colorClass="bg-blue-500"
+          icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}
+        />
+        <DashboardCard
+          title="Filières"
+          description="Configurez et organisez les différentes filières académiques."
+          to="/admin/filieres"
+          colorClass="bg-purple-500"
+          icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" /></svg>}
+        />
+        <DashboardCard
+          title="Modération"
+          description="Surveillez et gérez tous les événements de la plateforme."
+          to="/admin/moderation"
+          colorClass="bg-red-500"
+          icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const OrganisateurDashboard = ({ user }) => (
   <div className="space-y-8">
