@@ -124,6 +124,15 @@ const Sidebar = ({ isOpen, onClose }) => {
           {role === 'admin' && renderAdminMenu()}
           {role === 'organisateur' && renderOrganisateurMenu()}
           {(role === 'etudiant' || role === 'étudiant') && renderEtudiantMenu()}
+
+          <div className="mt-auto pt-4">
+            <NavSectionTitle>Information</NavSectionTitle>
+            <SidebarItem
+              to="/about"
+              label="À Propos"
+              onClick={onClose}
+            />
+          </div>
         </nav>
 
         {/* User Card Footer with Logout Icon */}

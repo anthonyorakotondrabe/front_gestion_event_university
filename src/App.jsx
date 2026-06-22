@@ -14,6 +14,7 @@ import RegistrationManagement from './features/inscriptions/components/Registrat
 import MyInscriptions from './features/inscriptions/components/MyInscriptions';
 import ModerationDashboard from './features/moderation/components/ModerationDashboard';
 import UserProfile from './features/profile/components/UserProfile';
+import About from './features/about/components/About';
 import FiliereManagement from './features/catalog/components/filieres/FiliereManagement';
 import CategoryManagement from './features/catalog/components/categories/CategoryManagement';
 import LieuManagement from './features/catalog/components/lieux/LieuManagement';
@@ -55,6 +56,7 @@ function App() {
 
             {/* Common Private Routes */}
             <Route path="/profile" element={<Layout><UserProfile /></Layout>} />
+            <Route path="/about" element={<Layout><About /></Layout>} />
 
             {/* Public Routes */}
             <Route path="/events" element={<Layout><EventCatalog /></Layout>} />
