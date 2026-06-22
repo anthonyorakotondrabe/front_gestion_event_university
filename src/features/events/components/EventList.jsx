@@ -6,7 +6,7 @@ import { formatToLocalTime } from '../../../utils/dateUtils';
 import { useConfirm } from '../../../context/ModalContext';
 import toast from 'react-hot-toast';
 
-const EventList = ({ events, onEdit }) => {
+const EventList = ({ events, onEdit, isModeration = false }) => {
   const { data: categories } = useCategories();
   const { data: lieux } = useLieux();
   const deleteEvent = useDeleteEvent();
@@ -22,13 +22,17 @@ const EventList = ({ events, onEdit }) => {
   };
 
   const handleDelete = async (id) => {
-    if (await confirm('Êtes-vous sûr de vouloir supprimer cet événement ? Cette action supprimera également toutes les inscriptions liées.', {
-      title: 'Suppression d\'événement',
-      confirmLabel: 'Supprimer',
+    const message = isModeration
+      ? 'Êtes-vous sûr de vouloir supprimer cet événement ? En tant que modérateur, cette action est définitive et supprimera également toutes les inscriptions.'
+      : 'Êtes-vous sûr de vouloir supprimer cet événement ? Cette action supprimera également toutes les inscriptions liées.';
+
+    if (await confirm(message, {
+      title: isModeration ? 'Action de Modération : Suppression' : 'Suppression d\'événement',
+      confirmLabel: 'Supprimer définitivement',
       type: 'danger'
     })) {
       deleteEvent.mutate(id, {
-        onSuccess: () => toast.success('Événement supprimé'),
+        onSuccess: () => toast.success('Événement supprimé avec succès'),
         onError: () => toast.error('Erreur lors de la suppression')
       });
     }
@@ -79,21 +83,28 @@ const EventList = ({ events, onEdit }) => {
               <h3 className="text-xl font-black text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors">
                 {event.titre}
               </h3>
+              {isModeration && event.createur_nom && (
+                <p className="text-[10px] font-bold text-gray-400 mt-1">
+                  Organisé par : <span className="text-gray-600 dark:text-gray-300">{event.createur_nom}</span>
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
-              <button
-                onClick={() => onEdit(event)}
-                className="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
-                title="Modifier"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </button>
+              {!isModeration && (
+                <button
+                  onClick={() => onEdit(event)}
+                  className="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
+                  title="Modifier"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+              )}
               <button
                 onClick={() => handleDelete(event.id_evenement)}
                 className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10"
-                title="Supprimer"
+                title={isModeration ? "Supprimer par modération" : "Supprimer"}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

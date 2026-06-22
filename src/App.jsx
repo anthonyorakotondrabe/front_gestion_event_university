@@ -12,6 +12,7 @@ import EventManagement from './features/events/components/EventManagement';
 import EventCatalog from './features/events/components/EventCatalog';
 import RegistrationManagement from './features/inscriptions/components/RegistrationManagement';
 import MyInscriptions from './features/inscriptions/components/MyInscriptions';
+import ModerationDashboard from './features/moderation/components/ModerationDashboard';
 import FiliereManagement from './features/catalog/components/filieres/FiliereManagement';
 import CategoryManagement from './features/catalog/components/categories/CategoryManagement';
 import LieuManagement from './features/catalog/components/lieux/LieuManagement';
@@ -42,7 +43,7 @@ function App() {
             <Route path="/admin/filieres" element={<Layout><FiliereManagement /></Layout>} />
             <Route path="/admin/categories" element={<Layout><CategoryManagement /></Layout>} />
             <Route path="/admin/lieux" element={<Layout><LieuManagement /></Layout>} />
-            <Route path="/admin/moderation" element={<Layout><PlaceholderPage title="Modération globale" /></Layout>} />
+            <Route path="/admin/moderation" element={<Layout><ModerationDashboard /></Layout>} />
 
             {/* Organisateur Routes */}
             <Route path="/events/manage" element={<Layout><EventManagement /></Layout>} />
