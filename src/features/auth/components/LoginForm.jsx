@@ -69,7 +69,7 @@ const LoginForm = () => {
         <div className="input-wrapper">
           <input
             type="email"
-            placeholder="student@university.edu"
+            placeholder="rasoa@university.edu"
             {...register('email', {
               required: 'L\'email est requis',
               pattern: {

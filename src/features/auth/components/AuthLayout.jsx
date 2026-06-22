@@ -75,7 +75,7 @@ const AuthLayout = ({ children }) => {
             </svg>
           </div>
           <h1>Uni<span>Event</span></h1>
-          <p className="subtitle">Innovation Platform</p>
+          <p className="subtitle">Organisez. Collaborez. Réussissez.</p>
         </div>
 
         <div className="auth-tabs">

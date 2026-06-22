@@ -73,7 +73,7 @@ const RegisterForm = () => {
         <div className="input-wrapper">
           <input
             type="text"
-            placeholder="John Doe"
+            placeholder="Rakotozaka Naivo"
             {...register('nom', { required: 'Le nom est requis' })}
           />
           <div className="input-progress"></div>
@@ -89,7 +89,7 @@ const RegisterForm = () => {
         <div className="input-wrapper">
           <input
             type="email"
-            placeholder="student@university.edu"
+            placeholder="raketaka@university.edu"
             {...register('email', {
               required: 'L\'email est requis',
               pattern: {
