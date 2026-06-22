@@ -2,9 +2,12 @@ import React from 'react';
 import { useUser } from '../../auth/hooks/useAuth';
 import { Navigate, Link } from 'react-router-dom';
 import { useEvents } from '../../events/hooks/useEvents';
-import { useMyInscriptions } from '../../inscriptions/hooks/useInscriptions';
+import { useMyInscriptions, useInscriptions, useEventInscriptions } from '../../inscriptions/hooks/useInscriptions';
 import { useUsersList } from '../../users/hooks/useUsers';
 import { formatRelativeTime } from '../../../utils/dateUtils';
+import OrganisateurSyntheticView from './OrganisateurSyntheticView';
+import { useQueries } from '@tanstack/react-query';
+import { inscriptionService } from '../../inscriptions/api/inscriptionService';
 
 const DashboardCard = ({ title, description, to, icon, colorClass }) => (
   <Link
@@ -100,49 +103,122 @@ const AdminDashboard = ({ user }) => {
   );
 };
 
-const OrganisateurDashboard = ({ user }) => (
-  <div className="space-y-8">
-    <div className="relative overflow-hidden bg-white dark:bg-[#1f2028] rounded-[2.5rem] p-10 shadow-2xl shadow-emerald-500/10 border border-gray-100 dark:border-white/5">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+const OrganisateurDashboard = ({ user }) => {
+  const { data: events, isLoading: isLoadingEvents } = useEvents();
 
-      <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div className="space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-full border border-emerald-100 dark:border-emerald-500/20">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Espace Créatif</span>
+  const myEvents = events?.filter(e => e.createur_id === user.id_utilisateur) || [];
+
+  // Parallel queries to get inscriptions for each event
+  const inscriptionsQueries = useQueries({
+    queries: myEvents.map(event => ({
+      queryKey: ['inscriptions', 'event', event.id_evenement],
+      queryFn: () => inscriptionService.getEventInscriptions(event.id_evenement),
+    })),
+  });
+
+  const isLoadingStats = inscriptionsQueries.some(q => q.isLoading);
+
+  // Aggregate stats from all queries
+  const stats = inscriptionsQueries.reduce((acc, query, index) => {
+    if (!query.data) return acc;
+
+    const event = myEvents[index];
+    const confirmed = query.data.filter(ins => ins.statut_inscription?.toLowerCase() === 'confirme');
+    const pending = query.data.filter(ins =>
+      ins.statut_inscription === 'EnAttente' ||
+      ins.statut_inscription?.toLowerCase() === 'en attente' ||
+      !ins.statut_inscription
+    );
+
+    acc.confirmedCount += confirmed.length;
+    acc.pendingCount += pending.length;
+    acc.totalRevenue += confirmed.length * event.prix;
+    acc.totalCapacity += event.capacite_max;
+
+    return acc;
+  }, { confirmedCount: 0, pendingCount: 0, totalRevenue: 0, totalCapacity: 0 });
+
+  const remainingPlaces = Math.max(0, stats.totalCapacity - stats.confirmedCount);
+
+  return (
+    <div className="space-y-8">
+      <div className="relative overflow-hidden bg-white dark:bg-[#1f2028] rounded-[2.5rem] p-10 shadow-2xl shadow-emerald-500/10 border border-gray-100 dark:border-white/5">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-full border border-emerald-100 dark:border-emerald-500/20">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Espace Créatif</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
+              Ravi de vous voir, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">{user.nom}</span>
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl font-medium">
+              Vos événements attendent leur public. Qu'allez-vous organiser aujourd'hui ?
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
-            Ravi de vous voir, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">{user.nom}</span>
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl font-medium">
-            Vos événements attendent leur public. Qu'allez-vous organiser aujourd'hui ?
-          </p>
+
+          <div className="hidden lg:block">
+            <div className="flex gap-4">
+              <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 text-center min-w-[100px]">
+                {isLoadingStats ? (
+                  <div className="h-8 w-16 bg-gray-200 animate-pulse rounded mx-auto mb-1"></div>
+                ) : (
+                  <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">{stats.totalRevenue.toLocaleString()} Ar</div>
+                )}
+                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Revenus</div>
+              </div>
+              <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 text-center min-w-[100px]">
+                {isLoadingStats ? (
+                  <div className="h-8 w-8 bg-gray-200 animate-pulse rounded mx-auto mb-1"></div>
+                ) : (
+                  <div className="text-xl font-black text-amber-500">{stats.pendingCount}</div>
+                )}
+                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">En attente</div>
+              </div>
+              <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 text-center min-w-[100px]">
+                {isLoadingStats ? (
+                  <div className="h-8 w-8 bg-gray-200 animate-pulse rounded mx-auto mb-1"></div>
+                ) : (
+                  <div className="text-xl font-black text-blue-500">{remainingPlaces}</div>
+                )}
+                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Places Libres</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <DashboardCard
-        title="Mes Événements"
-        description="Créez, modifiez ou annulez vos événements."
-        to="/events/manage"
-        colorClass="bg-emerald-500"
-        icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
-      />
-      <DashboardCard
-        title="Inscriptions"
-        description="Consultez et gérez les participants à vos événements."
-        to="/events/registrations"
-        colorClass="bg-amber-500"
-        icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <DashboardCard
+          title="Mes Événements"
+          description="Créez, modifiez ou annulez vos événements."
+          to="/events/manage"
+          colorClass="bg-emerald-500"
+          icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
+        />
+        <DashboardCard
+          title="Inscriptions"
+          description="Consultez et gérez les participants à vos événements."
+          to="/events/registrations"
+          colorClass="bg-amber-500"
+          icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>}
+        />
+      </div>
+
+      {isLoadingEvents ? (
+        <div className="h-64 bg-gray-100 dark:bg-white/5 rounded-[2rem] animate-pulse"></div>
+      ) : (
+        <OrganisateurSyntheticView events={myEvents} />
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 const EtudiantDashboard = ({ user }) => {
   const { data: events, isLoading: isLoadingEvents } = useEvents();
