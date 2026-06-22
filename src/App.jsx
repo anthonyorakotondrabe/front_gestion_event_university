@@ -13,6 +13,7 @@ import EventCatalog from './features/events/components/EventCatalog';
 import RegistrationManagement from './features/inscriptions/components/RegistrationManagement';
 import MyInscriptions from './features/inscriptions/components/MyInscriptions';
 import ModerationDashboard from './features/moderation/components/ModerationDashboard';
+import UserProfile from './features/profile/components/UserProfile';
 import FiliereManagement from './features/catalog/components/filieres/FiliereManagement';
 import CategoryManagement from './features/catalog/components/categories/CategoryManagement';
 import LieuManagement from './features/catalog/components/lieux/LieuManagement';
@@ -53,7 +54,7 @@ function App() {
             <Route path="/my-inscriptions" element={<Layout><MyInscriptions /></Layout>} />
 
             {/* Common Private Routes */}
-            <Route path="/profile" element={<Layout><PlaceholderPage title="Mon Profil Utilisateur" /></Layout>} />
+            <Route path="/profile" element={<Layout><UserProfile /></Layout>} />
 
             {/* Public Routes */}
             <Route path="/events" element={<Layout><EventCatalog /></Layout>} />
