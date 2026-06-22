@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import About from '../../about/components/About';
 import '../styles/Auth.css';
 
 const AuthLayout = ({ children }) => {
   const location = useLocation();
   const [dots, setDots] = useState([]);
+  const [showAbout, setShowAbout] = useState(false);
 
   useEffect(() => {
     const newDots = Array.from({ length: 25 }).map((_, i) => ({
@@ -97,6 +99,31 @@ const AuthLayout = ({ children }) => {
           {children}
         </div>
       </div>
+
+      {/* About Button */}
+      <button
+        className="about-btn"
+        onClick={() => setShowAbout(true)}
+        title="À propos"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </button>
+
+      {/* About Overlay */}
+      {showAbout && (
+        <div className="about-overlay" onClick={() => setShowAbout(false)}>
+          <div className="about-modal" onClick={e => e.stopPropagation()}>
+            <button className="close-about" onClick={() => setShowAbout(false)}>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <About />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
