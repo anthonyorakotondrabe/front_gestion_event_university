@@ -31,9 +31,11 @@ const Sidebar = ({ isOpen, onClose }) => {
   const role = user?.role?.toLowerCase().trim() || '';
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
-    onClose();
+    if (window.confirm('Voulez-vous vraiment vous déconnecter ?')) {
+      logout();
+      navigate('/login');
+      onClose();
+    }
   };
 
   const renderAdminMenu = () => (
