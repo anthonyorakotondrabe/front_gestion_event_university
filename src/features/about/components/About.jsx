@@ -74,7 +74,7 @@ const About = () => {
                 <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
                   Le Développeur
                 </h2>
-                <p className="text-indigo-600 dark:text-indigo-400 font-bold">RAKOTONDRABE Tokiniaina Anthonyo Sarobidy</p>
+                <p className="text-indigo-600 dark:text-indigo-400 font-bold">RAKOTONDRABE Tokiniaina Anthonyo Sarobidy et RAMBINIMBOLOLOKO Harvonjy</p>
                 <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Développeur Full-Stack & Concepteur Logiciel</p>
               </div>
 
