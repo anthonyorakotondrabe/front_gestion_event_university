@@ -2,13 +2,22 @@ import React from 'react';
 import { useUser } from '../../auth/hooks/useAuth';
 import { Navigate, Link } from 'react-router-dom';
 import { useEvents } from '../../events/hooks/useEvents';
-import { useMyInscriptions, useInscriptions, useEventInscriptions } from '../../inscriptions/hooks/useInscriptions';
+import { useMyInscriptions } from '../../inscriptions/hooks/useInscriptions';
 import { useUsersList } from '../../users/hooks/useUsers';
 import { formatRelativeTime } from '../../../utils/dateUtils';
 import OrganisateurSyntheticView from './OrganisateurSyntheticView';
 import { useQueries } from '@tanstack/react-query';
 import { inscriptionService } from '../../inscriptions/api/inscriptionService';
 
+/**
+ * Composant DashboardCard pour la navigation vers les différentes sections.
+ * @param {Object} props - Propriétés du composant.
+ * @param {string} props.title - Titre de la carte.
+ * @param {string} props.description - Description de la carte.
+ * @param {string} props.to - Chemin de navigation.
+ * @param {React.ReactNode} props.icon - Élément icône.
+ * @param {string} props.colorClass - Classe CSS pour la couleur de fond.
+ */
 const DashboardCard = ({ title, description, to, icon, colorClass }) => (
   <Link
     to={to}
@@ -26,6 +35,11 @@ const DashboardCard = ({ title, description, to, icon, colorClass }) => (
   </Link>
 );
 
+/**
+ * Vue AdminDashboard pour la supervision de la plateforme.
+ * @param {Object} props - Propriétés du composant.
+ * @param {Object} props.user - Objet utilisateur authentifié.
+ */
 const AdminDashboard = ({ user }) => {
   const { data: events } = useEvents();
   const { data: users } = useUsersList();
@@ -52,10 +66,10 @@ const AdminDashboard = ({ user }) => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
               </span>
-              <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em]">Panel de contrôle</span>
+              <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em]">Panneau de Contrôle</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white tracking-tight leading-none">
-              Bonjour, <br />
+              Content de vous revoir, <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Admin {user.nom}</span>
             </h1>
             <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl max-w-xl font-medium mx-auto lg:mx-0">
@@ -70,7 +84,7 @@ const AdminDashboard = ({ user }) => {
             </div>
             <div className="bg-white/50 dark:bg-white/5 backdrop-blur-md p-6 rounded-[2rem] border border-white dark:border-white/5 text-center shadow-sm group hover:scale-105 transition-transform duration-300">
               <div className="text-3xl font-black text-purple-600 dark:text-purple-400 tracking-tight">{ongoingEvents}</div>
-              <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">En cours</div>
+              <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">En Cours</div>
             </div>
           </div>
         </div>
@@ -79,21 +93,21 @@ const AdminDashboard = ({ user }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         <DashboardCard
           title="Utilisateurs"
-          description="Gérez les comptes, les rôles et les accès des membres de la communauté."
+          description="Gérer les comptes, les rôles et les accès des membres de la communauté."
           to="/admin/users"
           colorClass="bg-blue-600"
           icon={<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}
         />
         <DashboardCard
           title="Filières"
-          description="Configurez et organisez les différentes filières académiques de l'établissement."
+          description="Configurer et organiser les différents domaines académiques de l'institution."
           to="/admin/filieres"
           colorClass="bg-purple-600"
           icon={<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" /></svg>}
         />
         <DashboardCard
           title="Modération"
-          description="Surveillez et validez tous les événements publiés sur la plateforme."
+          description="Surveiller et valider tous les événements publiés sur la plateforme."
           to="/admin/moderation"
           colorClass="bg-red-600"
           icon={<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>}
@@ -103,12 +117,17 @@ const AdminDashboard = ({ user }) => {
   );
 };
 
+/**
+ * Vue OrganisateurDashboard pour les créateurs d'événements.
+ * @param {Object} props - Propriétés du composant.
+ * @param {Object} props.user - Objet utilisateur authentifié.
+ */
 const OrganisateurDashboard = ({ user }) => {
   const { data: events, isLoading: isLoadingEvents } = useEvents();
 
   const myEvents = events?.filter(e => e.createur_id === user.id_utilisateur) || [];
 
-  // Parallel queries to get inscriptions for each event
+  // Requêtes parallèles pour récupérer les inscriptions de chaque événement
   const inscriptionsQueries = useQueries({
     queries: myEvents.map(event => ({
       queryKey: ['inscriptions', 'event', event.id_evenement],
@@ -118,7 +137,7 @@ const OrganisateurDashboard = ({ user }) => {
 
   const isLoadingStats = inscriptionsQueries.some(q => q.isLoading);
 
-  // Aggregate stats from all queries
+  // Agrégation des statistiques globales à partir de toutes les inscriptions
   const stats = inscriptionsQueries.reduce((acc, query, index) => {
     if (!query.data) return acc;
 
@@ -143,7 +162,6 @@ const OrganisateurDashboard = ({ user }) => {
   return (
     <div className="space-y-8 md:space-y-12">
       <div className="relative overflow-hidden bg-white dark:bg-[#1f2028] rounded-[2.5rem] p-8 md:p-12 shadow-[0_20px_50px_rgba(16,185,129,0.1)] border border-white/40 dark:border-white/5 backdrop-blur-xl">
-        {/* Animated background blobs */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full -mr-32 -mt-32 blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500/10 rounded-full -ml-20 -mb-20 blur-3xl animate-pulse delay-700"></div>
 
@@ -157,11 +175,11 @@ const OrganisateurDashboard = ({ user }) => {
               <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em]">Espace Créateur</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white tracking-tight leading-none">
-              Ravi de vous voir, <br />
+              Bienvenue, <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">{user.nom}</span>
             </h1>
             <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl max-w-xl font-medium mx-auto lg:mx-0">
-              Vos événements attendent leur public. Qu'allez-vous organiser aujourd'hui ?
+              Vos événements attendent leur public. Quelle est la prochaine étape ?
             </p>
           </div>
 
@@ -174,7 +192,7 @@ const OrganisateurDashboard = ({ user }) => {
                   {stats.totalRevenue.toLocaleString()} <span className="text-sm">Ar</span>
                 </div>
               )}
-              <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Revenus</div>
+              <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Revenu</div>
             </div>
 
             <div className="bg-white/50 dark:bg-white/5 backdrop-blur-md p-6 rounded-[2rem] border border-white dark:border-white/5 text-center shadow-sm group hover:scale-105 transition-transform duration-300">
@@ -183,7 +201,7 @@ const OrganisateurDashboard = ({ user }) => {
               ) : (
                 <div className="text-2xl font-black text-amber-500 tracking-tight">{stats.pendingCount}</div>
               )}
-              <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">En attente</div>
+              <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">En Attente</div>
             </div>
 
             <div className="bg-white/50 dark:bg-white/5 backdrop-blur-md p-6 rounded-[2rem] border border-white dark:border-white/5 text-center shadow-sm group hover:scale-105 transition-transform duration-300">
@@ -201,17 +219,17 @@ const OrganisateurDashboard = ({ user }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         <DashboardCard
           title="Mes Événements"
-          description="Pilotez vos événements existants ou donnez vie à de nouveaux projets passionnants."
+          description="Gérer vos événements existants ou lancer de nouveaux projets passionnants."
           to="/events/manage"
           colorClass="bg-emerald-600"
           icon={<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
         />
         <DashboardCard
           title="Inscriptions"
-          description="Suivez l'engouement pour vos événements et gérez vos listes de participants en temps réel."
+          description="Suivre la progression des inscriptions et gérer la liste des participants en temps réel."
           to="/events/registrations"
           colorClass="bg-amber-500"
-          icon={<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>}
+          icon={<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>}
         />
       </div>
 
@@ -224,6 +242,11 @@ const OrganisateurDashboard = ({ user }) => {
   );
 };
 
+/**
+ * Vue EtudiantDashboard pour les utilisateurs étudiants.
+ * @param {Object} props - Propriétés du composant.
+ * @param {Object} props.user - Objet utilisateur authentifié.
+ */
 const EtudiantDashboard = ({ user }) => {
   const { data: events, isLoading: isLoadingEvents } = useEvents();
   const { data: inscriptions, isLoading: isLoadingInscriptions } = useMyInscriptions();
@@ -277,14 +300,14 @@ const EtudiantDashboard = ({ user }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         <DashboardCard
           title="Explorer"
-          description="Trouvez des événements qui vous correspondent et élargissez vos horizons."
+          description="Trouver des événements adaptés à vos intérêts et élargir vos horizons."
           to="/events"
           colorClass="bg-indigo-600"
           icon={<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>}
         />
         <DashboardCard
           title="Mes Inscriptions"
-          description="Retrouvez tous les événements auxquels vous participez et gérez votre planning."
+          description="Consulter vos événements enregistrés et gérer votre emploi du temps personnel."
           to="/my-inscriptions"
           colorClass="bg-pink-600"
           icon={<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>}
@@ -292,13 +315,12 @@ const EtudiantDashboard = ({ user }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-        {/* Événements Récents */}
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
               À ne pas <span className="text-indigo-600">Manquer</span>
             </h2>
-            <Link to="/events" className="text-xs font-black text-indigo-600 hover:underline uppercase tracking-widest">Voir tout</Link>
+            <Link to="/events" className="text-xs font-black text-indigo-600 hover:underline uppercase tracking-widest">Tout voir</Link>
           </div>
 
           <div className="space-y-4">
@@ -306,7 +328,7 @@ const EtudiantDashboard = ({ user }) => {
               [1, 2, 3].map(i => <div key={i} className="h-24 bg-gray-100 dark:bg-white/5 rounded-3xl animate-pulse"></div>)
             ) : !recentEvents || recentEvents.length === 0 ? (
               <div className="bg-white dark:bg-[#1f2028] p-10 rounded-[2.5rem] border border-dashed border-gray-200 dark:border-white/10 text-center text-sm text-gray-400 font-bold uppercase tracking-widest">
-                Aucun événement récent.
+                Aucun événement récent trouvé.
               </div>
             ) : (
               recentEvents.map(event => (
@@ -327,13 +349,12 @@ const EtudiantDashboard = ({ user }) => {
           </div>
         </div>
 
-        {/* Inscriptions Récentes */}
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
               Mes <span className="text-pink-600">Activités</span>
             </h2>
-            <Link to="/my-inscriptions" className="text-xs font-black text-pink-600 hover:underline uppercase tracking-widest">Voir tout</Link>
+            <Link to="/my-inscriptions" className="text-xs font-black text-pink-600 hover:underline uppercase tracking-widest">Tout voir</Link>
           </div>
 
           <div className="space-y-4">
@@ -341,7 +362,7 @@ const EtudiantDashboard = ({ user }) => {
               [1, 2, 3].map(i => <div key={i} className="h-24 bg-gray-100 dark:bg-white/5 rounded-3xl animate-pulse"></div>)
             ) : !recentInscriptions || recentInscriptions.length === 0 ? (
               <div className="bg-white dark:bg-[#1f2028] p-10 rounded-[2.5rem] border border-dashed border-gray-200 dark:border-white/10 text-center text-sm text-gray-400 font-bold uppercase tracking-widest">
-                Vous n'avez pas d'inscriptions récentes.
+                Aucune inscription récente trouvée.
               </div>
             ) : (
               recentInscriptions.map(ins => {
@@ -379,6 +400,10 @@ const EtudiantDashboard = ({ user }) => {
   );
 };
 
+/**
+ * Composant Dashboard principal qui route vers les vues spécifiques basées sur le rôle.
+ * @returns {React.ReactNode} Le tableau de bord rendu pour le rôle de l'utilisateur.
+ */
 const Dashboard = () => {
   const { data: user, isLoading, isError } = useUser();
 

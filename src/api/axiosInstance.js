@@ -7,7 +7,9 @@ const axiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add the auth token
+/**
+ * Intercepteur de requête pour attacher le jeton d'authentification aux requêtes sortantes.
+ */
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -16,17 +18,21 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
-// Response interceptor to handle errors (e.g., 401 Unauthorized)
+/**
+ * Intercepteur de réponse pour gérer les erreurs globales (ex: 401 Non autorisé).
+ */
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Handle logout or token refresh here
+    if (error.response?.status === 401) {
+      // Logique pour gérer les sessions expirées ou l'accès non autorisé
       localStorage.removeItem('token');
-      // window.location.href = '/login';
+      // Optionnel : window.location.href = '/login';
     }
     return Promise.reject(error);
   }

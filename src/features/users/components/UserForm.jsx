@@ -5,6 +5,9 @@ import { useCreateUser, useUpdateUser } from '../hooks/useUsers';
 
 /**
  * Formulaire modal pour la création et l'édition d'utilisateurs.
+ * @param {Object} props - Propriétés du composant.
+ * @param {Object} props.user - Données de l'utilisateur pour l'édition (null pour création).
+ * @param {Function} props.onClose - Callback pour fermer la modale.
  */
 const UserForm = ({ user, onClose }) => {
   const isEdit = !!user;
@@ -13,7 +16,9 @@ const UserForm = ({ user, onClose }) => {
   const updateUser = useUpdateUser();
 
   /**
-   * Normalise le rôle venant de l'API pour le sélecteur du formulaire.
+   * Normalise la chaîne de rôle pour l'entrée select du formulaire.
+   * @param {string} role - Rôle brut venant de l'API.
+   * @returns {string} Rôle normalisé.
    */
   const normalizeRole = (role) => {
     if (!role) return 'Etudiant';
@@ -32,6 +37,10 @@ const UserForm = ({ user, onClose }) => {
     }
   });
 
+  /**
+   * Gère la soumission du formulaire.
+   * @param {Object} data - Données du formulaire.
+   */
   const onSubmit = (data) => {
     if (isEdit) {
       updateUser.mutate({ id: user.id_utilisateur, data }, {
@@ -47,7 +56,7 @@ const UserForm = ({ user, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
       <div className="bg-white dark:bg-[#1f2028] rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all border border-gray-100 dark:border-white/10 animate-in zoom-in-95 duration-300">
-        {/* Header */}
+        {/* En-tête */}
         <div className="px-8 py-6 border-b border-gray-100 dark:border-white/5 flex justify-between items-center bg-gray-50/50 dark:bg-white/2">
           <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">
             {isEdit ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur'}
@@ -59,9 +68,9 @@ const UserForm = ({ user, onClose }) => {
           </button>
         </div>
 
-        {/* Form Body */}
+        {/* Corps du formulaire */}
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-5">
-          {/* Nom */}
+          {/* Champ Nom */}
           <div>
             <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Nom complet</label>
             <input
@@ -73,7 +82,7 @@ const UserForm = ({ user, onClose }) => {
             {errors.nom && <p className="text-red-500 text-[10px] font-bold mt-1.5 ml-1">{errors.nom.message}</p>}
           </div>
 
-          {/* Email */}
+          {/* Champ Email */}
           <div>
             <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Email</label>
             <input
@@ -95,7 +104,7 @@ const UserForm = ({ user, onClose }) => {
               <input
                 type="password"
                 {...register('password', {
-                  required: 'Requis pour la création',
+                  required: 'Requis pour les nouveaux utilisateurs',
                   minLength: { value: 6, message: 'Minimum 6 caractères' }
                 })}
                 className="w-full px-5 py-3.5 bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/5 rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
@@ -106,7 +115,7 @@ const UserForm = ({ user, onClose }) => {
           )}
 
           <div className="grid grid-cols-2 gap-4">
-            {/* Rôle */}
+            {/* Sélection du Rôle */}
             <div>
               <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Rôle</label>
               <select
@@ -119,7 +128,7 @@ const UserForm = ({ user, onClose }) => {
               </select>
             </div>
 
-            {/* Filière */}
+            {/* Sélection de la Filière */}
             <div>
               <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Filière</label>
               <select
@@ -127,7 +136,7 @@ const UserForm = ({ user, onClose }) => {
                 disabled={loadingFilieres}
                 className="w-full px-4 py-3.5 bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/5 rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer disabled:opacity-50"
               >
-                <option value="">Sélectionner</option>
+                <option value="">Sélectionner...</option>
                 {filieres?.map(f => (
                   <option key={f.id_filiere} value={f.id_filiere}>
                     {f.nom_filiere}
@@ -137,7 +146,7 @@ const UserForm = ({ user, onClose }) => {
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Actions du formulaire */}
           <div className="pt-6 flex gap-4">
             <button
               type="button"

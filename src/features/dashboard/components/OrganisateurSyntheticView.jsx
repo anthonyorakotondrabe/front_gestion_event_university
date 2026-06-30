@@ -2,6 +2,12 @@ import React from 'react';
 import { useEventInscriptions } from '../../inscriptions/hooks/useInscriptions';
 import { formatToLocalTime } from '../../../utils/dateUtils';
 
+/**
+ * Ligne d'événement individuelle pour la vue synthétique de l'organisateur.
+ * Affiche les statistiques d'inscription en temps réel et le revenu potentiel.
+ * @param {Object} props - Propriétés du composant.
+ * @param {Object} props.event - L'objet événement à afficher.
+ */
 const OrganisateurEventRow = ({ event }) => {
   const { data: inscriptions, isLoading } = useEventInscriptions(event.id_evenement);
 
@@ -25,7 +31,7 @@ const OrganisateurEventRow = ({ event }) => {
 
   return (
     <>
-      {/* Mobile Card Layout */}
+      {/* Mise en page Carte Mobile */}
       <div className="md:hidden bg-white dark:bg-white/[0.02] p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 space-y-4 mb-4">
         <div className="flex justify-between items-start gap-4">
           <div className="min-w-0 flex-1">
@@ -61,7 +67,7 @@ const OrganisateurEventRow = ({ event }) => {
         </div>
       </div>
 
-      {/* Desktop Table Row */}
+      {/* Ligne de Tableau Bureau */}
       <tr className="hidden md:table-row group hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors border-b border-gray-50 dark:border-white/5 last:border-0">
         <td className="px-6 py-6">
           <div className="font-black text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors truncate max-w-[250px]">
@@ -99,6 +105,9 @@ const OrganisateurEventRow = ({ event }) => {
   );
 };
 
+/**
+ * Vue synthétique pour les organisateurs afin de suivre tous leurs événements actifs d'un coup d'œil.
+ */
 const OrganisateurSyntheticView = ({ events }) => {
   return (
     <div className="space-y-6">
@@ -127,7 +136,7 @@ const OrganisateurSyntheticView = ({ events }) => {
                 <td colSpan="4" className="px-6 py-20 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <div className="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-300">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                     </div>
                     <span className="text-sm text-gray-400 font-bold uppercase tracking-widest">Aucun événement actif</span>
                   </div>
@@ -141,7 +150,7 @@ const OrganisateurSyntheticView = ({ events }) => {
           </tbody>
         </table>
 
-        {/* Mobile View Container */}
+        {/* Conteneur Vue Mobile */}
         <div className="md:hidden">
           {events.length === 0 ? (
             <div className="bg-white dark:bg-[#1f2028] p-12 rounded-[2.5rem] text-center border border-dashed border-gray-200 dark:border-white/10">

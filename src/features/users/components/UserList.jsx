@@ -2,27 +2,44 @@ import { useUsersList, useDeleteUser } from '../hooks/useUsers';
 import { useFilieres } from '../../catalog/hooks/useCatalog';
 import { useConfirm } from '../../../context/ModalContext';
 
+/**
+ * Composant UserList pour l'affichage et la gestion des membres de la plateforme.
+ * @param {Object} props - Propriétés du composant.
+ * @param {Function} props.onEdit - Callback lors du clic sur le bouton d'édition.
+ * @param {string} props.searchQuery - Terme de recherche actuel pour le filtrage.
+ */
 const UserList = ({ onEdit, searchQuery }) => {
   const { data: users, isLoading, isError } = useUsersList();
   const { data: filieres } = useFilieres();
   const deleteUser = useDeleteUser();
   const confirm = useConfirm();
 
+  /**
+   * Résout le nom de la filière à partir de son ID.
+   * @param {number} id - ID de la filière.
+   * @returns {string} Nom de la filière ou 'N/A'.
+   */
   const getFiliereName = (id) => {
     return filieres?.find(f => f.id_filiere === id)?.nom_filiere || 'N/A';
   };
 
+  /**
+   * Gère la suppression d'un utilisateur avec confirmation.
+   * @param {number} id - ID de l'utilisateur à supprimer.
+   */
   const handleDelete = async (id) => {
-    if (await confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.', {
-      title: 'Suppression d\'utilisateur',
+    const isConfirmed = await confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.', {
+      title: 'Supprimer l\'utilisateur',
       confirmLabel: 'Supprimer',
       type: 'danger'
-    })) {
+    });
+
+    if (isConfirmed) {
       deleteUser.mutate(id);
     }
   };
 
-  // Filtrage des utilisateurs en fonction de la recherche
+  // Filtrage des utilisateurs en fonction de la recherche (nom, email ou rôle)
   const filteredUsers = users?.filter(user => {
     const query = searchQuery?.toLowerCase() || '';
     return (
@@ -32,6 +49,11 @@ const UserList = ({ onEdit, searchQuery }) => {
     );
   });
 
+  /**
+   * Récupère les classes CSS pour le badge de rôle.
+   * @param {string} role - Rôle de l'utilisateur.
+   * @returns {string} Classes CSS Tailwind.
+   */
   const getRoleBadgeClass = (role) => {
     const r = role?.toLowerCase();
     if (r === 'admin') return 'bg-red-500/10 text-red-400 border-red-500/20';
@@ -51,14 +73,14 @@ const UserList = ({ onEdit, searchQuery }) => {
   if (isError) {
     return (
       <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl text-center">
-        <p className="text-red-400 font-medium">Une erreur est survenue lors du chargement.</p>
+        <p className="text-red-400 font-medium">Une erreur est survenue lors du chargement des utilisateurs.</p>
       </div>
     );
   }
 
   return (
     <div className="w-full">
-      {/* --- DESKTOP TABLE VIEW --- */}
+      {/* Vue Bureau : Tableau */}
       <div className="hidden md:block overflow-x-auto scrollbar-hide">
         <table className="w-full border-collapse">
           <thead>
@@ -72,7 +94,6 @@ const UserList = ({ onEdit, searchQuery }) => {
           <tbody className="divide-y divide-[#1e1e3a]">
             {filteredUsers?.map((user) => (
               <tr key={user.id_utilisateur} className="group hover:bg-[#161630] transition-colors">
-                {/* ... existing desktop row content ... */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#4f46e5] to-[#22d3ee] flex items-center justify-center text-white font-bold text-xs">
@@ -122,11 +143,10 @@ const UserList = ({ onEdit, searchQuery }) => {
         </table>
       </div>
 
-      {/* --- MOBILE CARD VIEW --- */}
+      {/* Vue Mobile : Cartes */}
       <div className="md:hidden space-y-4 px-2 py-4">
         {filteredUsers?.map((user) => (
           <div key={user.id_utilisateur} className="bg-[#111128] border border-[#1e1e3a] rounded-2xl p-5 relative overflow-hidden group active:bg-[#161630] transition-colors">
-            {/* ... existing mobile card content ... */}
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#4f46e5] to-[#22d3ee] flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-[#4f46e522]">
                 {user.nom?.charAt(0).toUpperCase()}

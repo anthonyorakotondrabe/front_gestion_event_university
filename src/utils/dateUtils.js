@@ -1,70 +1,44 @@
 /**
- * Formats a date to a human-readable local string including time.
- * @param {string|Date} date - The date to format.
- * @returns {string} Formatted local date and time.
+ * Formate une chaîne de date en un format lisible local.
+ * @param {string} dateString - La chaîne de date ISO à formater.
+ * @returns {string} Date formatée (ex: "12 oct. 2023").
  */
-export const formatToLocalTime = (date) => {
-  if (!date) return '';
-  const d = new Date(date);
-  return d.toLocaleString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+export const formatToLocalTime = (dateString) => {
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
   });
 };
 
 /**
- * Formats a date to a YYYY-MM-DDTHH:mm format in local time.
- * Useful for datetime-local input fields.
- * @param {string|Date} date - The date to format.
- * @returns {string} Formatted local ISO string.
+ * Formate une chaîne de date en un temps relatif lisible (ex: "il y a 2 jours").
+ * @param {string} dateString - La chaîne de date ISO à formater.
+ * @returns {string} Chaîne de temps relatif.
  */
-export const formatToLocalISO = (date) => {
-  if (!date) return '';
-  const d = new Date(date);
+export const formatRelativeTime = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const now = new Date();
 
-  // Adjust for local timezone offset
-  const offset = d.getTimezoneOffset() * 60000;
-  const localDate = new Date(d.getTime() - offset);
+  const diffInSeconds = Math.floor((now - date) / 1000);
 
-  return localDate.toISOString().slice(0, 16);
+  if (diffInSeconds < 0) return formatToLocalTime(date); // Repli pour les dates futures
+  if (diffInSeconds < 60) return "à l'instant";
+  if (diffInSeconds < 3600) return `il y a ${Math.floor(diffInSeconds / 60)} min`;
+  if (diffInSeconds < 86400) return `il y a ${Math.floor(diffInSeconds / 3600)} h`;
+  if (diffInSeconds < 2592000) return `il y a ${Math.floor(diffInSeconds / 86400)} j`;
+
+  return formatToLocalTime(dateString);
 };
 
 /**
- * Formats a date to a relative time string (e.g., "il y a 2 heures").
- * @param {string|Date} date - The date to format.
- * @returns {string} Relative time string.
+ * Valide si une date est dans le futur.
+ * @param {string} dateString - La chaîne de date à valider.
+ * @returns {boolean} True si la date est dans le futur.
  */
-export const formatRelativeTime = (date) => {
-  if (!date) return '';
-  const d = new Date(date);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now - d) / 1000);
-
-  if (diffInSeconds < 0) return formatToLocalTime(date); // Future date
-
-  const rtf = new Intl.RelativeTimeFormat('fr-FR', { numeric: 'auto' });
-
-  if (diffInSeconds < 60) {
-    return rtf.format(-diffInSeconds, 'second');
-  }
-
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) {
-    return rtf.format(-diffInMinutes, 'minute');
-  }
-
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) {
-    return rtf.format(-diffInHours, 'hour');
-  }
-
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 7) {
-    return rtf.format(-diffInDays, 'day');
-  }
-
-  return formatToLocalTime(date);
+export const isFutureDate = (dateString) => {
+  if (!dateString) return false;
+  return new Date(dateString) > new Date();
 };
